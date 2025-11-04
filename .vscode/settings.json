@@ -13,5 +13,11 @@
 	"editor.formatOnSave": true,
 	"editor.formatOnSaveMode": "file",
 
+	"github.copilot.chat.commitMessageGeneration.instructions": [
+		{
+			"text": "Format commit messages as one of these prefixes followed by a concise description: [feat] for new features, [fix] for bug fixes, [hotfix] for urgent main branch changes, or [refactor] for major code restructuring. Keep messages brief, literal, and avoid unnecessary buzzwords."
+		}
+	],
+
 	"prettier.configPath": ".prettierrc.js"
 }
