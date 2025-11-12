@@ -41,7 +41,7 @@ app.use(routes)
 
 // Start the server and listen on the specified port
 const port = (Keys.port as number) || 3000
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
 	console.log(
 		`${chalk.green('✓')} ${chalk.blue(
 			`Server is running on port ${port}! Visit http://localhost:${port}/ in your browser.`
