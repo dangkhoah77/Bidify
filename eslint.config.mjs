@@ -1,8 +1,9 @@
-import prettierConfig from 'eslint-config-prettier'
-import pluginReact from 'eslint-plugin-react'
 import { defineConfig } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
+import reactHooks from 'eslint-plugin-react-hooks'
+import pluginReact from 'eslint-plugin-react'
+import prettierConfig from 'eslint-config-prettier'
 
 export default defineConfig(
 	{
@@ -24,6 +25,9 @@ export default defineConfig(
 	tseslint.configs.base,
 	...tseslint.configs.recommended,
 
+	// React Hooks configurations
+	reactHooks.configs.flat.recommended,
+
 	// React configurations
 	{
 		files: ['**/*.{ts,tsx,jsx}'],
@@ -32,6 +36,15 @@ export default defineConfig(
 			react: {
 				version: 'detect',
 			},
+		},
+	},
+
+	// Specific rule adjustments
+	{
+		rules: {
+			eqeqeq: 'off',
+			'@typescript-eslint/no-namespace': 'off',
+			'@typescript-eslint/no-explicit-any': 'warn',
 		},
 	},
 

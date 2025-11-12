@@ -16,9 +16,10 @@ export default {
 
 	// Spacing & Bracket rules
 	bracketSpacing: true, // Add spaces between brackets in object literals
+	bracketSameLine: false, // Put closing brackets of JSX elements on a new line
 
 	// Arrow function formatting
-	arrowParens: 'avoid', // Omit parentheses when possible in arrow functions
+	arrowParens: 'always', // Omit parentheses when possible in arrow functions
 
 	// Prose wrapping behavior
 	proseWrap: 'always', // Always wrap markdown text
