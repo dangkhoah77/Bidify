@@ -47,7 +47,7 @@ echo "Setting up pre-push hook for ESLint..."
 cat > "$PRE_PUSH_FILE" << 'EOF'
 #!/bin/sh
 
-# Run ESLint on the entire project
+# Run ESLint on the entire project from the root
 npx eslint .
 
 # Check the exit code of the last command
@@ -64,18 +64,18 @@ exit 0
 EOF
 
 # --- Create the post-merge hook ---
-echo "Setting up post-merge hook to run 'npm install'..."
+echo "Setting up post-merge hook to run 'npm run install:all'..."
 cat > "$POST_MERGE_FILE" << 'EOF'
 #!/bin/sh
 
 # This hook runs after a successful `git pull` or `git merge`.
 echo "Checking for dependency changes..."
 
-# Check if package.json or package-lock.json has changed since the last state
+# Check if any package.json or package-lock.json has changed
 if git diff --name-only HEAD@{1} HEAD | grep -qE "package(-lock)?\.json$"; then
-    echo "Dependencies have changed. Running 'npm install'..."
-    npm install
-    echo "'npm install' finished."
+    echo "Dependencies have changed. Running 'npm run install:all'..."
+    npm run install:all
+    echo "'npm run install:all' finished."
 else
     echo "No dependency changes detected."
 fi
