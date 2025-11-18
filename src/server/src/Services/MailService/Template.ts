@@ -1,3 +1,4 @@
+import assert from 'assert'
 import type { Name, Email } from '../../Data/Types/index.js'
 
 /**
@@ -6,7 +7,7 @@ import type { Name, Email } from '../../Data/Types/index.js'
  * @param resetToken - The reset token for the user
  * @returns The reset password email template
  */
-export function resetPasswordEmail(resetToken: string): Email {
+function resetPasswordEmail(resetToken: string): Email {
 	return {
 		subject: 'Reset Password',
 		text:
@@ -22,7 +23,7 @@ export function resetPasswordEmail(resetToken: string): Email {
  *
  * @returns The confirmation email template after password reset
  */
-export function confirmResetPasswordEmail(): Email {
+function confirmResetPasswordEmail(): Email {
 	return {
 		subject: 'Password Changed',
 		text:
@@ -37,7 +38,7 @@ export function confirmResetPasswordEmail(): Email {
  * @param name - The name of the user
  * @returns The signup email template
  */
-export function signupEmail(name: Name): Email {
+function signupEmail(name: Name): Email {
 	return {
 		subject: 'Account Registration',
 		text: `Hi ${name.firstName} ${name.lastName}! Thank you for creating an account with us!.`,
@@ -49,16 +50,55 @@ export function signupEmail(name: Name): Email {
  *
  * @returns The contact email template
  */
-export function contactEmail(): Email {
+function contactEmail(): Email {
 	return {
 		subject: 'Contact Us',
 		text: 'We received your message! Our team will contact you soon. \n\n',
 	}
 }
 
-export default {
-	signupEmail,
-	resetPasswordEmail,
-	confirmResetPasswordEmail,
-	contactEmail,
+/**
+ * Prepare email template based on type
+ *
+ * @private
+ * @param type - type of email
+ * @param data - Data for the email
+ * @returns The prepared email template or null if type is unknown
+ */
+export default function (type: string, data: any): Email | null {
+	let message: Email | null = null
+
+	switch (type) {
+		case 'signup':
+			assert(
+				data.name &&
+					typeof data.name == 'object' &&
+					typeof data.name.firstName == 'string' &&
+					typeof data.name.lastName == 'string',
+				'Name data is required for signup email'
+			)
+			message = signupEmail(data.name)
+			break
+
+		case 'reset':
+			assert(
+				data.resetToken && typeof data.resetToken == 'string',
+				'Reset token is required for reset password email'
+			)
+			message = resetPasswordEmail(data.resetToken)
+			break
+
+		case 'reset-confirmation':
+			message = confirmResetPasswordEmail()
+			break
+
+		case 'contact':
+			message = contactEmail()
+			break
+
+		default:
+			console.warn(`Unknown email type: ${type}`)
+	}
+
+	return message
 }
