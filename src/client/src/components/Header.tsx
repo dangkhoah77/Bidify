@@ -43,7 +43,6 @@ export const Header = () => {
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex h-16 items-center justify-between">
 				<div className="flex items-center gap-6">
-					{/* Logo */}
 					<Link to="/" className="flex items-center space-x-2">
 						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-auction">
 							<span className="text-lg font-bold text-white">
@@ -55,7 +54,6 @@ export const Header = () => {
 						</span>
 					</Link>
 
-					{/* Navigation Menu */}
 					<nav className="hidden md:flex items-center space-x-1">
 						{categories.map((category) => (
 							<DropdownMenu key={category.name}>
@@ -89,9 +87,7 @@ export const Header = () => {
 					</nav>
 				</div>
 
-				{/* Right Side - Search, Icons, Button */}
 				<div className="flex flex-1 items-center justify-end space-x-4">
-					{/* Search */}
 					<form className="hidden w-full max-w-sm md:flex items-center space-x-2">
 						<Input
 							type="search"
@@ -103,16 +99,32 @@ export const Header = () => {
 						</Button>
 					</form>
 
-					{/* Icons */}
 					<div className="flex items-center gap-2">
-						<Button variant="ghost" size="icon" className="h-9 w-9">
-							<Heart className="h-4 w-4" />
-							<span className="sr-only">Yêu thích</span>
-						</Button>
-						<Button variant="ghost" size="icon" className="h-9 w-9">
-							<User className="h-4 w-4" />
-							<span className="sr-only">Tài khoản</span>
-						</Button>
+						<Link to="/profile">
+							<Button
+								variant="ghost"
+								size="icon"
+								className="h-9 w-9"
+							>
+								<Heart className="h-4 w-4" />
+								<span className="sr-only">Yêu thích</span>
+							</Button>
+						</Link>
+						<Link to="/profile">
+							<Button
+								variant="ghost"
+								size="icon"
+								className="h-9 w-9"
+							>
+								<User className="h-4 w-4" />
+								<span className="sr-only">Tài khoản</span>
+							</Button>
+						</Link>
+						<Link to="/auth">
+							<Button size="sm" className="hidden md:inline-flex">
+								Đăng nhập
+							</Button>
+						</Link>
 						<Button
 							variant="ghost"
 							size="icon"
