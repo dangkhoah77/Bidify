@@ -44,7 +44,7 @@ const port = (Keys.port as number) || 3000
 app.listen(port, '0.0.0.0', () => {
 	console.log(
 		`${chalk.green('✓')} ${chalk.blue(
-			`Server is running on port ${port}! Visit http://localhost:${port}/ in your browser.`
+			`Server is running on port ${port}! Visit http://${Keys.app.clientURL}:${port}/ in your browser.`
 		)}`
 	)
 })
