@@ -26,7 +26,7 @@ const options: JwtPassport.StrategyOptions = {
  * @param done - Callback function to be called after verification
  */
 function verify(
-	payload: { id: string } & any,
+	payload: { id: string },
 	done: (error: Error | null, user: typeof User | null) => void
 ) {
 	// Find the user by ID from the JWT payload
