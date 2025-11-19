@@ -1,13 +1,13 @@
 import { Search, Heart, User, Menu, ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/input/button'
+import { Input } from '@/components/ui/input/input'
 import { Link } from 'react-router-dom'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/navigation/dropdown-menu'
 
 export const Header = () => {
 	const categories = [
