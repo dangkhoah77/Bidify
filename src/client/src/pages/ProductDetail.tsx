@@ -31,8 +31,10 @@ const ProductDetail = () => {
   const relatedProducts = mockProducts.filter((p) => p.id !== id).slice(0, 5);
 
   const [selectedImage, setSelectedImage] = useState(0);
-  const [bidAmount, setBidAmount] = useState(product.currentPrice + product.stepPrice);
-
+  const [bidAmount, setBidAmount] = useState(
+    product.currentPrice + product.stepPrice
+  );
+  const [isFavorite, setIsFavorite] = useState(false);
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -51,9 +53,16 @@ const ProductDetail = () => {
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm"
+                  className="h-10 w-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg"
+                  onClick={() => setIsFavorite(!isFavorite)}
                 >
-                  <Heart className="h-5 w-5" />
+                  <Heart
+                    className={`h-5 w-5 transition-all ${
+                      isFavorite
+                        ? "fill-red-500 text-red-500"
+                        : "text-gray-700 hover:text-red-500"
+                    }`}
+                  />
                 </Button>
                 <Button
                   variant="secondary"
@@ -76,7 +85,11 @@ const ProductDetail = () => {
                       : "border-transparent hover:border-muted-foreground"
                   }`}
                 >
-                  <img src={image} alt={`${product.title} ${idx + 1}`} className="h-full w-full object-cover" />
+                  <img
+                    src={image}
+                    alt={`${product.title} ${idx + 1}`}
+                    className="h-full w-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -88,7 +101,9 @@ const ProductDetail = () => {
               <Badge variant="secondary" className="mb-2">
                 {product.category}
               </Badge>
-              <h1 className="text-3xl font-bold leading-tight">{product.title}</h1>
+              <h1 className="text-3xl font-bold leading-tight">
+                {product.title}
+              </h1>
             </div>
 
             <CountdownTimer endTime={product.endTime} />
@@ -97,7 +112,9 @@ const ProductDetail = () => {
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-end justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Giá hiện tại</p>
+                    <p className="text-sm text-muted-foreground">
+                      Giá hiện tại
+                    </p>
                     <p className="text-4xl font-bold text-primary">
                       {product.currentPrice.toLocaleString("vi-VN")}₫
                     </p>
@@ -117,14 +134,19 @@ const ProductDetail = () => {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Số lượt đấu giá:</span>
+                    <span className="text-muted-foreground">
+                      Số lượt đấu giá:
+                    </span>
                     <span className="font-semibold">{product.bidCount}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">Đăng:</span>
                     <span className="font-semibold">
-                      {formatDistanceToNow(product.postedAt, { addSuffix: true, locale: vi })}
+                      {formatDistanceToNow(product.postedAt, {
+                        addSuffix: true,
+                        locale: vi,
+                      })}
                     </span>
                   </div>
                 </div>
@@ -143,14 +165,18 @@ const ProductDetail = () => {
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Star className="h-3 w-3 fill-accent text-accent" />
                         <span>
-                          {product.seller.rating}% ({product.seller.totalRatings} đánh giá)
+                          {product.seller.rating}% (
+                          {product.seller.totalRatings} đánh giá)
                         </span>
                       </div>
                     </div>
                   </div>
 
                   <p className="text-sm text-muted-foreground">
-                    Người đặt giá cao nhất: <span className="font-semibold">{product.highestBidder}</span>
+                    Người đặt giá cao nhất:{" "}
+                    <span className="font-semibold">
+                      {product.highestBidder}
+                    </span>
                   </p>
                 </div>
               </CardContent>
@@ -170,11 +196,17 @@ const ProductDetail = () => {
                       step={product.stepPrice}
                       className="text-lg font-semibold"
                     />
-                    <span className="flex items-center text-lg font-semibold">₫</span>
+                    <span className="flex items-center text-lg font-semibold">
+                      ₫
+                    </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Bước giá: {product.stepPrice.toLocaleString("vi-VN")}₫ | Giá đề nghị:{" "}
-                    {(product.currentPrice + product.stepPrice).toLocaleString("vi-VN")}₫
+                    Bước giá: {product.stepPrice.toLocaleString("vi-VN")}₫ | Giá
+                    đề nghị:{" "}
+                    {(product.currentPrice + product.stepPrice).toLocaleString(
+                      "vi-VN"
+                    )}
+                    ₫
                   </p>
                 </div>
 
@@ -184,7 +216,11 @@ const ProductDetail = () => {
                     Đặt giá
                   </Button>
                   {product.buyNowPrice && (
-                    <Button size="lg" variant="outline" className="flex-1 border-accent text-accent hover:bg-accent hover:text-accent-foreground">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="flex-1 border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                    >
                       <ShoppingCart className="mr-2 h-5 w-5" />
                       Mua ngay
                     </Button>
@@ -193,7 +229,8 @@ const ProductDetail = () => {
 
                 {product.autoExtend && (
                   <p className="text-xs text-muted-foreground text-center">
-                    ⚡ Sản phẩm có tự động gia hạn 10 phút nếu có lượt đấu giá mới trước khi kết thúc 5 phút
+                    ⚡ Sản phẩm có tự động gia hạn 10 phút nếu có lượt đấu giá
+                    mới trước khi kết thúc 5 phút
                   </p>
                 )}
               </CardContent>
@@ -237,9 +274,14 @@ const ProductDetail = () => {
                           <AvatarFallback>{qa.questioner[0]}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <p className="text-sm font-semibold">{qa.questioner}</p>
+                          <p className="text-sm font-semibold">
+                            {qa.questioner}
+                          </p>
                           <p className="text-sm text-muted-foreground">
-                            {formatDistanceToNow(qa.askedAt, { addSuffix: true, locale: vi })}
+                            {formatDistanceToNow(qa.askedAt, {
+                              addSuffix: true,
+                              locale: vi,
+                            })}
                           </p>
                           <p className="mt-2">{qa.question}</p>
                         </div>
@@ -255,9 +297,14 @@ const ProductDetail = () => {
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
-                            <p className="text-sm font-semibold">{product.seller.name}</p>
+                            <p className="text-sm font-semibold">
+                              {product.seller.name}
+                            </p>
                             <p className="text-sm text-muted-foreground">
-                              {formatDistanceToNow(qa.answeredAt!, { addSuffix: true, locale: vi })}
+                              {formatDistanceToNow(qa.answeredAt!, {
+                                addSuffix: true,
+                                locale: vi,
+                              })}
                             </p>
                             <p className="mt-2">{qa.answer}</p>
                           </div>
@@ -270,7 +317,9 @@ const ProductDetail = () => {
                 <Separator />
 
                 <div className="space-y-3">
-                  <label className="text-sm font-medium">Đặt câu hỏi cho người bán</label>
+                  <label className="text-sm font-medium">
+                    Đặt câu hỏi cho người bán
+                  </label>
                   <Textarea placeholder="Nhập câu hỏi của bạn..." />
                   <Button>Gửi câu hỏi</Button>
                 </div>
@@ -293,16 +342,25 @@ const ProductDetail = () => {
                     <div
                       key={bid.id}
                       className={`flex items-center justify-between rounded-lg p-3 ${
-                        idx === 0 ? "bg-primary/10 border border-primary" : "bg-muted"
+                        idx === 0
+                          ? "bg-primary/10 border border-primary"
+                          : "bg-muted"
                       }`}
                     >
                       <div>
                         <p className="font-semibold">{bid.bidder}</p>
                         <p className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(bid.time, { addSuffix: true, locale: vi })}
+                          {formatDistanceToNow(bid.time, {
+                            addSuffix: true,
+                            locale: vi,
+                          })}
                         </p>
                       </div>
-                      <p className={`font-bold ${idx === 0 ? "text-primary" : ""}`}>
+                      <p
+                        className={`font-bold ${
+                          idx === 0 ? "text-primary" : ""
+                        }`}
+                      >
                         {bid.amount.toLocaleString("vi-VN")}₫
                       </p>
                     </div>
@@ -315,7 +373,9 @@ const ProductDetail = () => {
 
         {/* Related Products */}
         <div className="mt-12">
-          <h2 className="mb-6 text-2xl font-bold">Sản phẩm khác cùng chuyên mục</h2>
+          <h2 className="mb-6 text-2xl font-bold">
+            Sản phẩm khác cùng chuyên mục
+          </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {relatedProducts.map((product) => (
               <ProductCard key={product.id} {...product} />

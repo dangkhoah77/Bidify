@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-
+import { useState } from "react";
 interface ProductCardProps {
   id: string;
   image: string;
@@ -31,9 +31,12 @@ export const ProductCard = ({
   isNew,
   category,
 }: ProductCardProps) => {
-  const timeLeft = formatDistanceToNow(endTime, { addSuffix: true, locale: vi });
+  const timeLeft = formatDistanceToNow(endTime, {
+    addSuffix: true,
+    locale: vi,
+  });
   const isEndingSoon = endTime.getTime() - Date.now() < 3 * 24 * 60 * 60 * 1000; // 3 days
-
+  const [isFavorite, setIsFavorite] = useState(false);
   return (
     <Link to={`/product/${id}`}>
       <Card className="group overflow-hidden transition-all hover:shadow-elevated">
@@ -46,13 +49,19 @@ export const ProductCard = ({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background"
+            className="absolute right-2 top-2 h-10 w-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-all"
             onClick={(e) => {
               e.preventDefault();
-              // Add to wishlist logic
+              setIsFavorite(!isFavorite);
             }}
           >
-            <Heart className="h-4 w-4" />
+            <Heart
+              className={`h-5 w-5 transition-all ${
+                isFavorite
+                  ? "fill-red-500 text-red-500"
+                  : "fill-none text-gray-700 hover:text-red-500"
+              }`}
+            />
           </Button>
           {isNew && (
             <Badge className="absolute left-2 top-2 bg-accent text-accent-foreground animate-pulse-slow">

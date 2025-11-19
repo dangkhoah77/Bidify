@@ -1,4 +1,4 @@
-import { Search, Heart, User, Menu } from 'lucide-react'
+import { Search, Heart, User, Menu, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Link } from 'react-router-dom'
@@ -8,7 +8,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronDown } from 'lucide-react'
 
 export const Header = () => {
 	const categories = [
@@ -44,6 +43,7 @@ export const Header = () => {
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex h-16 items-center justify-between">
 				<div className="flex items-center gap-6">
+					{/* Logo */}
 					<Link to="/" className="flex items-center space-x-2">
 						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-auction">
 							<span className="text-lg font-bold text-white">
@@ -55,14 +55,14 @@ export const Header = () => {
 						</span>
 					</Link>
 
-					{/* Navigation Menu với DropdownMenu */}
+					{/* Navigation Menu */}
 					<nav className="hidden md:flex items-center space-x-1">
 						{categories.map((category) => (
 							<DropdownMenu key={category.name}>
 								<DropdownMenuTrigger asChild>
 									<Button
 										variant="ghost"
-										className="h-10 px-4 py-2 text-sm font-medium focus-visible:ring-0 focus-visible:ring-offset-0"
+										className="h-10 px-4 py-2 text-sm font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
 									>
 										{category.name}
 										<ChevronDown className="ml-1 h-3 w-3" />
@@ -71,6 +71,7 @@ export const Header = () => {
 								<DropdownMenuContent
 									align="start"
 									className="w-[200px]"
+									sideOffset={8}
 								>
 									{category.subcategories.map((sub) => (
 										<DropdownMenuItem key={sub} asChild>
@@ -88,7 +89,9 @@ export const Header = () => {
 					</nav>
 				</div>
 
+				{/* Right Side - Search, Icons, Button */}
 				<div className="flex flex-1 items-center justify-end space-x-4">
+					{/* Search */}
 					<form className="hidden w-full max-w-sm md:flex items-center space-x-2">
 						<Input
 							type="search"
@@ -100,6 +103,7 @@ export const Header = () => {
 						</Button>
 					</form>
 
+					{/* Icons */}
 					<div className="flex items-center gap-2">
 						<Button variant="ghost" size="icon" className="h-9 w-9">
 							<Heart className="h-4 w-4" />

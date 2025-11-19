@@ -37,14 +37,22 @@ const Index = () => {
               <span className="text-accent">Sản Phẩm Mơ Ước</span>
             </h1>
             <p className="text-lg text-white/90">
-              Khám phá hàng ngàn sản phẩm chính hãng được đấu giá mỗi ngày.
-              Từ công nghệ, thời trang đến đồ sưu tầm độc đáo.
+              Khám phá hàng ngàn sản phẩm chính hãng được đấu giá mỗi ngày. Từ
+              công nghệ, thời trang đến đồ sưu tầm độc đáo.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="bg-white text-blue-600 hover:bg-gray-100 font-semibold"
+              >
                 Khám phá ngay
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-white bg-transparent text-white hover:bg-white/10 font-semibold"
+              >
                 Cách thức hoạt động
               </Button>
             </div>
@@ -133,10 +141,18 @@ const Index = () => {
               Đăng ký ngay hôm nay và nhận ưu đãi đặc biệt cho người dùng mới
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="bg-white text-blue-600 hover:bg-gray-100 font-semibold"
+              >
                 Đăng ký miễn phí
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-white bg-transparent text-white hover:bg-white/10 font-semibold"
+              >
                 Tìm hiểu thêm
               </Button>
             </div>
