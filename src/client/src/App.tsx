@@ -16,6 +16,7 @@ import AdminProducts from './pages/admin/AdminProducts'
 import AdminUsers from './pages/admin/AdminUsers'
 import OrderCompletion from './pages/OrderCompletion'
 import NotFound from './pages/NotFound'
+import EditProductDescription from './pages/EditProductDescription'
 
 const queryClient = new QueryClient()
 
@@ -42,6 +43,10 @@ const App = () => (
 					<Route
 						path="/seller/products"
 						element={<SellerProducts />}
+					/>
+					<Route
+						path="/seller/products/:id/edit-description"
+						element={<EditProductDescription />}
 					/>
 					<Route
 						path="/admin/categories"

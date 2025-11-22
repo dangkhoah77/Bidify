@@ -41,7 +41,7 @@ export default function Profile() {
 		rating: 4.5,
 		totalReviews: 24,
 		positiveReviews: 22,
-		role: 'bidder', // bidder or seller
+		role: 'seller', // bidder or seller - Change to see seller tabs
 	}
 
 	const reviews = [
@@ -71,6 +71,8 @@ export default function Profile() {
 	const watchList = mockProducts.slice(0, 4)
 	const biddingProducts = mockProducts.slice(4, 8)
 	const wonProducts = mockProducts.slice(8, 12)
+	const activeProducts = mockProducts.slice(0, 6)
+	const soldProducts = mockProducts.slice(6, 10)
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -137,7 +139,9 @@ export default function Profile() {
 
 					<div className="lg:col-span-3">
 						<Tabs value={activeTab} onValueChange={setActiveTab}>
-							<TabsList className="grid w-full grid-cols-5">
+							<TabsList
+								className={`grid w-full ${user.role === 'seller' ? 'grid-cols-7' : 'grid-cols-5'}`}
+							>
 								<TabsTrigger value="info">
 									Thông tin
 								</TabsTrigger>
@@ -151,6 +155,16 @@ export default function Profile() {
 								<TabsTrigger value="reviews">
 									Đánh giá
 								</TabsTrigger>
+								{user.role === 'seller' && (
+									<>
+										<TabsTrigger value="selling">
+											Đang bán
+										</TabsTrigger>
+										<TabsTrigger value="sold">
+											Đã bán
+										</TabsTrigger>
+									</>
+								)}
 							</TabsList>
 
 							<TabsContent value="info">
@@ -347,6 +361,67 @@ export default function Profile() {
 									</CardContent>
 								</Card>
 							</TabsContent>
+							{user.role === 'seller' && (
+								<>
+									<TabsContent value="selling">
+										<Card>
+											<CardHeader>
+												<div className="flex items-center gap-2">
+													<Package className="h-5 w-5" />
+													<CardTitle>
+														Sản phẩm đang bán
+													</CardTitle>
+												</div>
+												<CardDescription>
+													Các sản phẩm đang trong
+													phiên đấu giá
+												</CardDescription>
+											</CardHeader>
+											<CardContent>
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+													{activeProducts.map(
+														(product) => (
+															<ProductCard
+																key={product.id}
+																{...product}
+															/>
+														)
+													)}
+												</div>
+											</CardContent>
+										</Card>
+									</TabsContent>
+
+									<TabsContent value="sold">
+										<Card>
+											<CardHeader>
+												<div className="flex items-center gap-2">
+													<Award className="h-5 w-5" />
+													<CardTitle>
+														Sản phẩm đã bán
+													</CardTitle>
+												</div>
+												<CardDescription>
+													Các sản phẩm đã kết thúc đấu
+													giá
+												</CardDescription>
+											</CardHeader>
+											<CardContent>
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+													{soldProducts.map(
+														(product) => (
+															<ProductCard
+																key={product.id}
+																{...product}
+															/>
+														)
+													)}
+												</div>
+											</CardContent>
+										</Card>
+									</TabsContent>
+								</>
+							)}
 						</Tabs>
 					</div>
 				</div>
