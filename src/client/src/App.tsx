@@ -17,6 +17,7 @@ import AdminUsers from './pages/admin/AdminUsers'
 import OrderCompletion from './pages/OrderCompletion'
 import NotFound from './pages/NotFound'
 import EditProductDescription from './pages/EditProductDescription'
+import AdminAuctionSettings from './pages/admin/AdminAuctionSettings'
 
 const queryClient = new QueryClient()
 
@@ -54,6 +55,10 @@ const App = () => (
 					/>
 					<Route path="/admin/products" element={<AdminProducts />} />
 					<Route path="/admin/users" element={<AdminUsers />} />
+					<Route
+						path="/admin/auction-settings"
+						element={<AdminAuctionSettings />}
+					/>
 					<Route path="/order/:id" element={<OrderCompletion />} />
 					{/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
 					<Route path="*" element={<NotFound />} />
