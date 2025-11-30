@@ -19,6 +19,35 @@ function resetPasswordEmail(resetToken: string): Email {
 }
 
 /**
+ * ✅ NEW: Reset Password OTP Email Template
+ * @param data - Object containing otp, expiresIn, and name
+ * @returns The reset password OTP email template
+ */
+function resetPasswordOtpEmail(data: {
+	otp: string
+	expiresIn: string
+	name: Name
+}): Email {
+	const { otp, expiresIn, name } = data
+
+	return {
+		subject: '🔐 Password Reset - OTP Verification',
+		text:
+			`Hi ${name.firstName} ${name.lastName},\n\n` +
+			'You requested to reset your password. Use the OTP code below to continue:\n\n' +
+			`OTP CODE: ${otp}\n\n` +
+			`⏱️ This OTP will expire in ${expiresIn}.\n\n` +
+			'⚠️ Security Notice:\n' +
+			'- Never share this OTP with anyone\n' +
+			'- AuctionHub staff will never ask for your OTP\n' +
+			"- If you didn't request this, please secure your account immediately\n\n" +
+			"If you didn't request a password reset, you can safely ignore this email.\n\n" +
+			'Best regards,\n' +
+			'AuctionHub Team',
+	}
+}
+
+/**
  * Confirmation Email Template after Password Reset
  *
  * @returns The confirmation email template after password reset
@@ -86,6 +115,26 @@ export default function (type: string, data: any): Email | null {
 				'Reset token is required for reset password email'
 			)
 			message = resetPasswordEmail(data.resetToken)
+			break
+
+		case 'reset-otp':
+			// ✅ NEW: Handle reset-otp template
+			assert(
+				data.otp && typeof data.otp == 'string',
+				'OTP is required for reset OTP email'
+			)
+			assert(
+				data.expiresIn && typeof data.expiresIn == 'string',
+				'Expiry time is required for reset OTP email'
+			)
+			assert(
+				data.name &&
+					typeof data.name == 'object' &&
+					typeof data.name.firstName == 'string' &&
+					typeof data.name.lastName == 'string',
+				'Name data is required for reset OTP email'
+			)
+			message = resetPasswordOtpEmail(data)
 			break
 
 		case 'reset-confirmation':

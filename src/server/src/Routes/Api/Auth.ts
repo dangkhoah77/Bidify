@@ -11,6 +11,7 @@ import User from '../../Models/User.js'
 import Auth from '../../Middleware/Auth.js'
 import MailService from '../../Services/MailService/index.js'
 import rateLimit from 'express-rate-limit'
+import { generateOTPWithExpiry, verifyOTP } from '../../Utility/otp.utils.js'
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY
 
 const authLimiter = rateLimit({
@@ -292,6 +293,224 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
 		})
 	}
 })
+
+/**
+ * ✅ NEW: Request password reset OTP
+ * @route POST /auth/forgot-password
+ */
+router.post(
+	'/forgot-password',
+	authLimiter,
+	async (req: Request, res: Response) => {
+		try {
+			const { email, recaptchaToken } = req.body
+
+			// Verify reCAPTCHA
+			if (!recaptchaToken) {
+				return res.status(400).json({
+					error: 'reCAPTCHA token is required.',
+				})
+			}
+
+			const recaptchaResult = await verifyRecaptcha(
+				recaptchaToken,
+				'forgot_password'
+			)
+
+			console.log('reCAPTCHA verification:', {
+				action: recaptchaResult.action,
+				score: recaptchaResult.score,
+				email,
+			})
+
+			if (!recaptchaResult.success || recaptchaResult.score < 0.4) {
+				return res.status(400).json({
+					error: 'reCAPTCHA verification failed.',
+				})
+			}
+
+			// Validate email
+			if (!email) {
+				return res.status(400).json({
+					error: 'You must enter an email address.',
+				})
+			}
+
+			// Find user
+			const user = await User.findOne({ email })
+
+			if (!user) {
+				// ⚠️ Security: Don't reveal if email exists
+				return res.status(200).json({
+					success: true,
+					message:
+						'If that email exists, an OTP has been sent to it.',
+				})
+			}
+
+			// Generate OTP
+			const { otp, expires } = generateOTPWithExpiry()
+
+			// Save OTP to user
+			user.otp = otp
+			user.otpExpires = expires
+			await user.save()
+
+			// Send OTP email
+			await MailService.sendMail(user.email, 'reset-otp', {
+				otp,
+				expiresIn: '10 minutes',
+				name: { firstName: user.firstName, lastName: user.lastName },
+			})
+
+			console.log('✅ OTP sent to:', email)
+			console.log('🔐 OTP (DEV ONLY):', otp) // ⚠️ Remove in production!
+
+			res.status(200).json({
+				success: true,
+				message: 'An OTP has been sent to your email.',
+			})
+		} catch (error: any) {
+			console.error('❌ Forgot password error:', error)
+			res.status(400).json({
+				error: error.message || 'Your request could not be processed.',
+			})
+		}
+	}
+)
+
+/**
+ * ✅ NEW: Verify OTP and generate reset token
+ * @route POST /auth/verify-reset-otp
+ */
+router.post(
+	'/verify-reset-otp',
+	authLimiter,
+	async (req: Request, res: Response) => {
+		try {
+			const { email, otp } = req.body
+
+			// Validate input
+			if (!email || !otp) {
+				return res.status(400).json({
+					error: 'Email and OTP are required.',
+				})
+			}
+
+			// Find user
+			const user = await User.findOne({ email })
+
+			if (!user) {
+				return res.status(400).json({
+					error: 'Invalid email or OTP.',
+				})
+			}
+
+			// Verify OTP
+			const verification = verifyOTP(user.otp, otp, user.otpExpires)
+
+			if (!verification.valid) {
+				return res.status(400).json({
+					error: verification.reason,
+				})
+			}
+
+			// Generate reset token (valid for 30 minutes)
+			const resetToken = crypto.randomBytes(32).toString('hex')
+			user.resetPasswordToken = resetToken
+			user.resetPasswordExpires = new Date(Date.now() + 30 * 60 * 1000)
+
+			// Clear OTP
+			user.otp = undefined
+			user.otpExpires = undefined
+
+			await user.save()
+
+			console.log('✅ OTP verified for:', email)
+
+			res.status(200).json({
+				success: true,
+				message: 'OTP verified successfully.',
+				resetToken, // Send to frontend
+			})
+		} catch (error: any) {
+			console.error('❌ Verify OTP error:', error)
+			res.status(400).json({
+				error: error.message || 'Failed to verify OTP.',
+			})
+		}
+	}
+)
+
+/**
+ * ✅ NEW: Reset password with token
+ * @route POST /auth/reset-password
+ */
+router.post(
+	'/reset-password',
+	authLimiter,
+	async (req: Request, res: Response) => {
+		try {
+			const { resetToken, newPassword } = req.body
+
+			// Validate input
+			if (!resetToken || !newPassword) {
+				return res.status(400).json({
+					error: 'Reset token and new password are required.',
+				})
+			}
+
+			if (newPassword.length < 6) {
+				return res.status(400).json({
+					error: 'Password must be at least 6 characters long.',
+				})
+			}
+
+			// Find user by reset token
+			const user = await User.findOne({
+				resetPasswordToken: resetToken,
+				resetPasswordExpires: { $gt: Date.now() },
+			})
+
+			if (!user) {
+				return res.status(400).json({
+					error: 'Invalid or expired reset token.',
+				})
+			}
+
+			// Hash new password
+			const salt = await bcrypt.genSalt(10)
+			const hash = await bcrypt.hash(newPassword, salt)
+
+			// Update password and clear reset fields
+			user.password = hash
+			user.resetPasswordToken = undefined
+			user.resetPasswordExpires = undefined
+			user.otp = undefined
+			user.otpExpires = undefined
+
+			await user.save()
+
+			// Send confirmation email
+			await MailService.sendMail(user.email, 'reset-confirmation', {
+				name: { firstName: user.firstName, lastName: user.lastName },
+			})
+
+			console.log('✅ Password reset for:', user.email)
+
+			res.status(200).json({
+				success: true,
+				message:
+					'Password reset successfully. You can now login with your new password.',
+			})
+		} catch (error: any) {
+			console.error('❌ Reset password error:', error)
+			res.status(400).json({
+				error: error.message || 'Failed to reset password.',
+			})
+		}
+	}
+)
 
 /**
  * Forgot password route.

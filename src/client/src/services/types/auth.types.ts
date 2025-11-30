@@ -115,8 +115,6 @@ export interface AuthContextType {
 	logout: () => Promise<void>
 	verifyOtp: (data: VerifyOtpDto) => Promise<void>
 	resendOtp: (email: string) => Promise<void>
-	forgotPassword: (email: string) => Promise<void>
-	resetPassword: (data: ResetPasswordDto) => Promise<void>
 	updateProfile: (data: Partial<User>) => Promise<void>
 	refreshUser: () => Promise<void>
 }

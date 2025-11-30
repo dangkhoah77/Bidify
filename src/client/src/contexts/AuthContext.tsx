@@ -158,39 +158,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	}
 
-	const forgotPassword = async (email: string) => {
-		try {
-			const response = await authApi.forgotPassword(email)
-
-			if (response.success) {
-				toast.success('Mã xác thực đã được gửi đến email của bạn')
-			}
-		} catch (error: unknown) {
-			toast.error(getErrorMessage(error))
-			throw error
-		}
-	}
-
-	const resetPassword = async (data: ResetPasswordDto) => {
-		try {
-			const response = await authApi.resetPassword(
-				data.email,
-				data.otpCode,
-				data.newPassword
-			)
-
-			if (response.success) {
-				toast.success(
-					'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.'
-				)
-				navigate('/auth')
-			}
-		} catch (error: unknown) {
-			toast.error(getErrorMessage(error))
-			throw error
-		}
-	}
-
 	const updateProfile = async (data: Partial<User>) => {
 		try {
 			// TODO: Implement update profile API
@@ -248,8 +215,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				logout,
 				verifyOtp,
 				resendOtp,
-				forgotPassword,
-				resetPassword,
 				updateProfile,
 				refreshUser,
 			}}

@@ -253,6 +253,15 @@ export default function Auth() {
 										}
 										required
 									/>
+									{/* ✅ NEW: Forgot Password Link */}
+									<div className="flex items-center justify-end mt-1">
+										<Link
+											to="/forgot-password"
+											className="text-sm text-primary hover:underline"
+										>
+											Quên mật khẩu?
+										</Link>
+									</div>
 								</div>
 
 								<div className="flex items-center justify-between">
@@ -273,12 +282,6 @@ export default function Auth() {
 											Ghi nhớ đăng nhập
 										</Label>
 									</div>
-									<Link
-										to="/forgot-password"
-										className="text-sm text-blue-600 hover:underline"
-									>
-										Quên mật khẩu?
-									</Link>
 								</div>
 
 								<Button

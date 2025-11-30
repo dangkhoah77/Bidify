@@ -21,6 +21,7 @@ import SellerProducts from './pages/SellerProducts'
 import EditProductDescription from './pages/EditProductDescription'
 import OrderCompletion from './pages/OrderCompletion'
 import NotFound from './pages/NotFound'
+import ForgotPassword from './pages/ForgotPassword'
 
 // Admin pages
 import AdminCategories from './pages/admin/AdminCategories'
@@ -65,7 +66,11 @@ const App = () => (
 									</PublicRoute>
 								}
 							/>
-
+							{/* ✅ NEW: Forgot Password Route */}
+							<Route
+								path="/forgot-password"
+								element={<ForgotPassword />}
+							/>
 							{/* Protected Routes - Require Authentication */}
 							<Route
 								path="/profile"
