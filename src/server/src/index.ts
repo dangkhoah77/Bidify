@@ -28,7 +28,12 @@ app.use(
 )
 
 // Middleware to enable Cross-Origin Resource Sharing
-app.use(cors())
+app.use(
+	cors({
+		origin: 'http://localhost:8080', // Frontend URL
+		credentials: true,
+	})
+)
 
 // Connect to the MongoDB database
 setupDB()

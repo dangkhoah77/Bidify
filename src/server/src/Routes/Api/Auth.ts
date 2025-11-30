@@ -4,12 +4,69 @@ import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
-
+import axios from 'axios'
 import { EMAIL_PROVIDER } from '../../Data/Constants/index.js'
 import Keys from '../../Config/Keys.js'
 import User from '../../Models/User.js'
 import Auth from '../../Middleware/Auth.js'
 import MailService from '../../Services/MailService/index.js'
+import rateLimit from 'express-rate-limit'
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY
+
+const authLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 5, // 5 attempts per window
+	message: 'Too many attempts. Please try again later.',
+	standardHeaders: true,
+	legacyHeaders: false,
+	// Optional: Store in Redis for distributed systems
+	// store: new RedisStore({ client: redisClient })
+})
+
+// Helper function to verify reCAPTCHA
+async function verifyRecaptcha(
+	token: string,
+	expectedAction: string
+): Promise<{
+	success: boolean
+	score: number
+	action: string
+}> {
+	try {
+		const response = await axios.post(
+			`https://www.google.com/recaptcha/api/siteverify`,
+			null,
+			{
+				params: {
+					secret: RECAPTCHA_SECRET_KEY,
+					response: token,
+				},
+				timeout: 5000,
+			}
+		)
+
+		const { success, score, action, hostname } = response.data
+
+		// ✅ Validate action matches
+		if (action !== expectedAction) {
+			console.error(
+				`Action mismatch: expected ${expectedAction}, got ${action}`
+			)
+			return { success: false, score: 0, action }
+		}
+
+		// ✅ Optional: Validate hostname
+		// if (hostname !== 'yourdomain.com') {
+		//     console.error('Hostname mismatch')
+		//     return { success: false, score: 0, action }
+		// }
+
+		return { success, score: score || 0, action }
+	} catch (error) {
+		console.error('reCAPTCHA verification error:', error)
+		return { success: false, score: 0, action: '' }
+	}
+}
 
 /** Router for authentication-related routes */
 const router = express.Router()
@@ -25,9 +82,37 @@ assert(tokenLife, 'JWT token life is not configured.')
  *
  * @route POST /login
  */
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', authLimiter, async (req: Request, res: Response) => {
 	try {
-		const { email, password } = req.body
+		const { email, password, recaptchaToken } = req.body
+		// Verify reCAPTCHA
+		if (!recaptchaToken) {
+			return res.status(400).json({
+				error: 'reCAPTCHA token is required.',
+			})
+		}
+
+		const recaptchaResult = await verifyRecaptcha(recaptchaToken, 'login')
+		console.log('reCAPTCHA verification:', {
+			action: recaptchaResult.action,
+			score: recaptchaResult.score,
+			success: recaptchaResult.success,
+			email: email,
+			timestamp: new Date().toISOString(),
+		})
+		if (recaptchaResult.score < 0.3) {
+			console.warn('🚨 SUSPICIOUS ACTIVITY:', {
+				score: recaptchaResult.score,
+				email,
+				ip: req.ip,
+			})
+			// Optional: Send to monitoring service (Datadog, Sentry, etc.)
+		}
+		if (!recaptchaResult.success || recaptchaResult.score < 0.5) {
+			return res.status(400).json({
+				error: 'reCAPTCHA verification failed. Please try again.',
+			})
+		}
 
 		// Validate input
 		if (!email) {
@@ -104,9 +189,41 @@ router.post('/login', async (req: Request, res: Response) => {
  *
  * @route POST /register
  */
-router.post('/register', async (req: Request, res: Response) => {
+router.post('/register', authLimiter, async (req: Request, res: Response) => {
 	try {
-		const { email, firstName, lastName, password } = req.body
+		const { email, firstName, lastName, password, recaptchaToken } =
+			req.body
+		// Verify reCAPTCHA
+		if (!recaptchaToken) {
+			return res.status(400).json({
+				error: 'reCAPTCHA token is required.',
+			})
+		}
+
+		const recaptchaResult = await verifyRecaptcha(
+			recaptchaToken,
+			'register'
+		)
+		console.log('reCAPTCHA verification:', {
+			action: recaptchaResult.action,
+			score: recaptchaResult.score,
+			success: recaptchaResult.success,
+			email: email,
+			timestamp: new Date().toISOString(),
+		})
+		if (recaptchaResult.score < 0.3) {
+			console.warn('🚨 SUSPICIOUS ACTIVITY:', {
+				score: recaptchaResult.score,
+				email,
+				ip: req.ip,
+			})
+			// Optional: Send to monitoring service (Datadog, Sentry, etc.)
+		}
+		if (!recaptchaResult.success || recaptchaResult.score < 0.6) {
+			return res.status(400).json({
+				error: 'reCAPTCHA verification failed. Please try again.',
+			})
+		}
 
 		// Validate input
 		if (!email) {
@@ -182,10 +299,39 @@ router.post('/register', async (req: Request, res: Response) => {
  *
  * @route POST /forgot
  */
-router.post('/forgot', async (req: Request, res: Response) => {
+router.post('/forgot', authLimiter, async (req: Request, res: Response) => {
 	try {
-		const { email } = req.body
+		const { email, recaptchaToken } = req.body
+		if (!recaptchaToken) {
+			return res.status(400).json({
+				error: 'reCAPTCHA token is required.',
+			})
+		}
 
+		const recaptchaResult = await verifyRecaptcha(
+			recaptchaToken,
+			'forgot_password'
+		)
+		console.log('reCAPTCHA verification:', {
+			action: recaptchaResult.action,
+			score: recaptchaResult.score,
+			success: recaptchaResult.success,
+			email: email,
+			timestamp: new Date().toISOString(),
+		})
+		if (recaptchaResult.score < 0.3) {
+			console.warn('🚨 SUSPICIOUS ACTIVITY:', {
+				score: recaptchaResult.score,
+				email,
+				ip: req.ip,
+			})
+			// Optional: Send to monitoring service (Datadog, Sentry, etc.)
+		}
+		if (!recaptchaResult.success || recaptchaResult.score < 0.4) {
+			return res.status(400).json({
+				error: 'reCAPTCHA verification failed.',
+			})
+		}
 		// Validate input
 		if (!email) {
 			return res
@@ -336,6 +482,53 @@ router.post('/reset', Auth, async (req: Request, res: Response) => {
 		})
 	} catch (error: any) {
 		// Handle errors
+		res.status(400).json({
+			error:
+				error.message ||
+				'Your request could not be processed. Please try again.',
+		})
+	}
+})
+
+/**
+ * Get current user route.
+ * Returns current authenticated user's information.
+ *
+ * @route GET /me
+ */
+router.get('/me', Auth, async (req: Request, res: Response) => {
+	try {
+		const userId = (req.user as any).id
+
+		console.log('🔄 Fetching user info for ID:', userId)
+
+		// Find user by ID
+		const user = await User.findById(userId).select('-password') // Exclude password
+
+		if (!user) {
+			console.log('❌ User not found:', userId)
+			return res.status(404).json({
+				error: 'User not found.',
+			})
+		}
+
+		console.log('✅ User found:', user.email)
+
+		// Respond with user info
+		res.status(200).json({
+			success: true,
+			user: {
+				id: user.id,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				email: user.email,
+				role: user.role,
+				provider: user.provider,
+				createdAt: user.createdAt,
+			},
+		})
+	} catch (error: any) {
+		console.error('❌ Get current user error:', error)
 		res.status(400).json({
 			error:
 				error.message ||
