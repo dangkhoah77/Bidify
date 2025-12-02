@@ -28,3 +28,28 @@ export async function fetchHomeProducts(): Promise<HomeProductsResponse> {
 	const res = await api.get<HomeProductsResponse>('/products/home')
 	return res.data
 }
+
+// export async function fetchProductsByCategory(
+// 	categoryId: string
+// ): Promise<ProductsByCategoryResponse> {
+// 	const res = await api.get<ProductsByCategoryResponse>(
+// 		`/products/by-category/${categoryId}`
+// 	)
+// 	return res.data
+// }
+export type ProductsByCategoryResponse = {
+	products: ProductDTO[]
+}
+export type ProductsByCategoryNameResponse = {
+	products: ProductDTO[]
+	categoryName: string
+}
+
+export async function fetchProductsByCategoryName(
+	categoryName: string
+): Promise<ProductsByCategoryNameResponse> {
+	const res = await api.get<ProductsByCategoryNameResponse>(
+		`/products/by-category/${encodeURIComponent(categoryName)}`
+	)
+	return res.data
+}
