@@ -22,3 +22,10 @@ export type ProductsByCategoryNameResponse = {
 	products: ProductDTO[]
 	categoryName: string
 }
+
+export type ProductsListResponse = {
+	products: ProductDTO[]
+	total: number
+	page: number
+	totalPages: number
+}

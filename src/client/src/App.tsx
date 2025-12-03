@@ -23,6 +23,7 @@ import OrderCompletion from './pages/OrderCompletion'
 import NotFound from './pages/NotFound'
 import ForgotPassword from './pages/ForgotPassword'
 import VerifyOTP from './pages/VerifyOTP'
+import { ProductsList } from './pages/ProductsList'
 // Admin pages
 import AdminCategories from './pages/admin/AdminCategories'
 import AdminProducts from './pages/admin/AdminProducts'
@@ -54,6 +55,10 @@ const App = () => (
 							<Route
 								path="/category/:category"
 								element={<CategoryProducts />}
+							/>
+							<Route
+								path="/products/:type"
+								element={<ProductsList />}
 							/>
 							<Route path="/search" element={<Search />} />
 
