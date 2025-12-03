@@ -24,6 +24,7 @@ const ProductSchema = new Schema(
 		autoExtend: { type: Boolean, default: false },
 		isSold: { type: Boolean, default: false },
 		winner: { type: Schema.Types.ObjectId, ref: 'User' },
+		idCount: { type: Number, default: 0 },
 	},
 	{ timestamps: true }
 )
