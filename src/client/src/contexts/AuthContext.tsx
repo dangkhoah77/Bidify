@@ -88,21 +88,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	}
 
-	const register = async (data: RegisterDto) => {
+	const register = async (
+		data: RegisterDto
+	): Promise<{
+		success: boolean
+		message: string
+		email: string
+	}> => {
 		try {
 			const response = await authApi.register(data)
 			console.log('✅ Register response:', response)
-			if (response.success) {
-				let token = response.token
-				if (token.startsWith('Bearer ')) {
-					token = token.replace('Bearer ', '')
-				}
 
-				setAccessToken(token)
-				setUser(response.user)
-				toast.success('Đăng ký thành công!')
-				navigate('/')
+			// ✅ CHANGED: Don't auto-login anymore
+			// User needs to verify OTP first
+
+			if (response.success) {
+				toast.success(
+					response.message ||
+						'Đăng ký thành công! Vui lòng kiểm tra email.'
+				)
+
+				// ✅ Return response so component can access email
+				return {
+					success: response.success,
+					message: response.message,
+					email: response.email,
+				}
 			}
+
+			throw new Error('Registration failed')
 		} catch (error: unknown) {
 			toast.error(getErrorMessage(error))
 			throw error

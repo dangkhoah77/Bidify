@@ -13,6 +13,7 @@ export interface RegisterDto {
 	firstName: string
 	lastName: string
 	password: string
+	address: string
 	recaptchaToken?: string
 }
 
@@ -111,7 +112,11 @@ export interface AuthContextType {
 	isAuthenticated: boolean
 	isLoading: boolean
 	login: (data: LoginDto) => Promise<void>
-	register: (data: RegisterDto) => Promise<void>
+	register: (data: RegisterDto) => Promise<{
+		success: boolean
+		message: string
+		email: string
+	}>
 	logout: () => Promise<void>
 	verifyOtp: (data: VerifyOtpDto) => Promise<void>
 	resendOtp: (email: string) => Promise<void>

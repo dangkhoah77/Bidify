@@ -24,7 +24,13 @@ export const authApi = {
 		return response.data
 	},
 
-	register: async (data: RegisterDto): Promise<AuthResponse> => {
+	register: async (
+		data: RegisterDto
+	): Promise<{
+		success: boolean
+		message: string
+		email: string
+	}> => {
 		const response = await apiClient.post(API_ENDPOINTS.AUTH.REGISTER, data)
 		return response.data
 	},

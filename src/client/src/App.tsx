@@ -22,7 +22,7 @@ import EditProductDescription from './pages/EditProductDescription'
 import OrderCompletion from './pages/OrderCompletion'
 import NotFound from './pages/NotFound'
 import ForgotPassword from './pages/ForgotPassword'
-
+import VerifyOTP from './pages/VerifyOTP'
 // Admin pages
 import AdminCategories from './pages/admin/AdminCategories'
 import AdminProducts from './pages/admin/AdminProducts'
@@ -66,6 +66,7 @@ const App = () => (
 									</PublicRoute>
 								}
 							/>
+							<Route path="/verify-otp" element={<VerifyOTP />} />
 							{/* ✅ NEW: Forgot Password Route */}
 							<Route
 								path="/forgot-password"

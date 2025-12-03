@@ -17,6 +17,9 @@ export const API_ENDPOINTS = {
 	PRODUCTS: {
 		BASE: '/products',
 		DETAIL: (id: string) => `/products/${id}`,
+		HOME: '/products/home', // ✅ THÊM
+		BY_CATEGORY_NAME: (categoryName: string) =>
+			`/products/by-category/${encodeURIComponent(categoryName)}`, // ✅ THÊM
 		SEARCH: '/products/search',
 		ENDING_SOON: '/products/ending-soon',
 		MOST_BIDS: '/products/most-bids',
@@ -28,7 +31,6 @@ export const API_ENDPOINTS = {
 			`/products/${id}/append-description`,
 		REJECT_BID: (id: string) => `/products/${id}/reject-bid`,
 	},
-
 	// Categories
 	CATEGORIES: {
 		BASE: '/categories',

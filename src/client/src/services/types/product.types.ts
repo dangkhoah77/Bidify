@@ -1,40 +1,24 @@
-export interface Product {
-	id: string
-	title: string
+export type ProductDTO = {
+	_id: string
+	name: string
 	description: string
-	image: string
-	additionalImages: string[]
+	images: string[]
 	currentPrice: number
 	buyNowPrice?: number
-	startPrice: number
-	stepPrice: number
-	categoryId: string
-	category: string
-	sellerId: string
-	seller: {
-		id: string
-		name: string
-		avatar?: string
-		rating: number
-		totalReviews: number
-	}
-	highestBidder?: string
-	bidCount: number
-	endTime: Date
-	autoExtend: boolean
+	endTime: string
+	bidCount?: number
+	categoryName?: string
+	highestBidderName?: string
 	isNew?: boolean
-	createdAt: Date
-	updatedAt: Date
 }
 
-export interface CreateProductDto {
-	title: string
-	description: string
-	images: File[]
-	startPrice: number
-	stepPrice: number
-	buyNowPrice?: number
-	categoryId: string
-	autoExtend: boolean
-	endTime: Date
+export type HomeProductsResponse = {
+	endingSoon: ProductDTO[]
+	mostBids: ProductDTO[]
+	highestPrice: ProductDTO[]
+}
+
+export type ProductsByCategoryNameResponse = {
+	products: ProductDTO[]
+	categoryName: string
 }

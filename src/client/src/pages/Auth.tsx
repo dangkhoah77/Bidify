@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/input/button'
 import { Input } from '../components/ui/input/input'
 import { Label } from '../components/ui/input/label'
@@ -49,6 +49,8 @@ export default function Auth() {
 	const [otpLoading, setOtpLoading] = useState(false)
 	const [otpEmail, setOtpEmail] = useState('')
 
+	const navigate = useNavigate()
+
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setLoginLoading(true)
@@ -91,20 +93,27 @@ export default function Auth() {
 			// lastName là phần còn lại (join lại nếu có nhiều từ)
 			const lastName = nameParts.slice(1).join(' ') || ''
 
-			await register({
-				firstName,
-				lastName,
+			const response = await register({
+				firstName: firstName,
+				lastName: lastName,
 				email: registerEmail,
 				password: registerPassword,
-				recaptchaToken, // Gửi token lên backend
+				address: registerAddress,
+				recaptchaToken,
 			})
+			toast.success('Đăng ký thành công! Vui lòng kiểm tra email.')
 
+			// ✅ Navigate to OTP verification page
+			navigate('/verify-otp', {
+				state: { email: response.email },
+			})
 			// Backend tự động login sau register, không cần OTP
 			// Nếu backend của bạn CẦN OTP, uncomment dòng dưới:
 			// setOtpEmail(registerEmail)
 			// setShowOtp(true)
 		} catch (error) {
 			console.error('Register error:', error)
+			toast.error(error.response?.data?.error || 'Đăng ký thất bại')
 		} finally {
 			setRegisterLoading(false)
 		}
@@ -341,6 +350,21 @@ export default function Auth() {
 										value={registerName}
 										onChange={(e) =>
 											setRegisterName(e.target.value)
+										}
+										required
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="register-address">
+										Địa chỉ
+									</Label>
+									<Input
+										id="register-address"
+										type="text"
+										placeholder="227 Nguyễn Văn Cừ, phường Chợ Quán, TPHCM"
+										value={registerAddress}
+										onChange={(e) =>
+											setRegisterAddress(e.target.value)
 										}
 										required
 									/>

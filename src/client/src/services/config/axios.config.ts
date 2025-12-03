@@ -1,9 +1,9 @@
 import axios, { AxiosInstance } from 'axios'
 import { authInterceptor, errorInterceptor } from '../interceptors'
 
-// Dùng localhost thay vì 0.0.0.0
+// ✅ SỬA: Dùng port 4000 thay vì 3000
 const API_BASE_URL =
-	process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000/api'
+	process.env.REACT_APP_API_BASE_URL || 'http://localhost:4000/api'
 
 console.log('API Base URL:', API_BASE_URL)
 
