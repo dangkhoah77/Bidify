@@ -58,11 +58,14 @@ export interface AuthResponse {
 export interface User {
 	id: string
 	email: string
+	firstName: string
+	lastName: string
 	fullName: string
 	address?: string
 	dateOfBirth?: Date | string
 	avatar?: string
-	roles: UserRole[]
+	role?: string
+	roles?: UserRole[]
 	isEmailVerified: boolean
 	rating: UserRating
 	upgradeRequest?: UpgradeRequest
