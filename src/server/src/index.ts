@@ -12,21 +12,21 @@ import Keys from './Config/Keys.js'
 import setupDB from './Utility/Database.js'
 import initializePassport from './Config/Passport.js'
 
-//Static folder ảnh tạm (TS) trong src/index.ts (server entry):
-import path from 'path'
-import { fileURLToPath } from 'url'
+// //Static folder ảnh tạm (TS) trong src/index.ts (server entry):
+// import path from 'path'
+// import { fileURLToPath } from 'url'
 // Lấy __dirname trong môi trường ES module
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// const __filename = fileURLToPath(import.meta.url)
+// const __dirname = path.dirname(__filename)
 
 // Initialize Express application
 const app = express()
 
-// Serve thư mục ảnh tạm: server/public/images
-app.use(
-	'/images',
-	express.static(path.join(__dirname, '..', 'public', 'images'))
-)
+// // Serve thư mục ảnh tạm: server/public/images
+// app.use(
+// 	'/images',
+// 	express.static(path.join(__dirname, '..', 'public', 'images'))
+// )
 
 // Middleware to parse URL-encoded data and JSON data
 app.use(express.urlencoded({ extended: true }))

@@ -3,7 +3,8 @@ import { ProductCard } from '@/components/ProductCard'
 import { Button } from '@/components/ui/input/button'
 import { Badge } from '@/components/ui/data-display/badge'
 import { TrendingUp, Clock, DollarSign, Sparkles } from 'lucide-react'
-import { useHomeProducts } from '@/app/containers/Products/useHomeProducts' //Sử dụng data từ backend
+// import { useHomeProducts } from '@/app/containers/Products/useHomeProducts'
+import { useHomeProducts } from '@/services'
 // import { mockProducts } from '@/lib/mockData'
 
 const Index = () => {
@@ -49,11 +50,9 @@ const Index = () => {
 		)
 	}
 
-	const BACKEND_URL = 'http://localhost:4000' // port backend của bạn
-
 	const mapToCardProps = (p: (typeof endingSoon)[number]) => ({
 		id: p._id,
-		image: `${BACKEND_URL}${p.images?.[0] ?? '/images/placeholder.jpg'}`,
+		image: p.images?.[0] ?? '/images/placeholder.jpg',
 		title: p.name,
 		currentPrice: p.currentPrice,
 		buyNowPrice: p.buyNowPrice,

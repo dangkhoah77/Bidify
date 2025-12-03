@@ -152,10 +152,9 @@
 import { useParams } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { ProductCard } from '@/components/ProductCard'
-import { useProductsByCategoryName } from '@/app/containers/Products/useProductsByCategoryName'
+// import { useProductsByCategoryName } from '@/app/containers/Products/useProductsByCategoryName'
+import { useProductsByCategoryName } from '@/services'
 import { Badge } from '@/components/ui/data-display/badge'
-
-const BACKEND_URL = 'http://localhost:4000'
 
 const CategoryProducts = () => {
 	// ⚠️ QUAN TRỌNG: phải decode từ URL
@@ -194,7 +193,7 @@ const CategoryProducts = () => {
 
 	const mapToCardProps = (p: (typeof products)[number]) => ({
 		id: p._id,
-		image: `${BACKEND_URL}${p.images?.[0] ?? '/images/placeholder.jpg'}`,
+		image: p.images?.[0] ?? '/images/placeholder.jpg',
 		title: p.name,
 		currentPrice: p.currentPrice,
 		buyNowPrice: p.buyNowPrice,
