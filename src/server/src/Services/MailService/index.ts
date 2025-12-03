@@ -42,13 +42,14 @@ const MailService = {
 				subject: message.subject,
 				text: message.text,
 			}
-
+			console.log('Sending email...')
 			// Send email via Mailgun
 			return await MailService.mailgun.messages.create(
 				domain || 'DOMAIN_NAME',
 				config
 			)
 		} catch (error) {
+			console.error(error)
 			return error
 		}
 	},

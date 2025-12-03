@@ -19,6 +19,32 @@ function resetPasswordEmail(resetToken: string): Email {
 }
 
 /**
+ * ✅ NEW: Registration OTP Email Template
+ */
+function registrationOtpEmail(data: {
+	otp: string
+	expiresIn: string
+	name: Name
+}): Email {
+	const { otp, expiresIn, name } = data
+
+	return {
+		subject: '🎉 Welcome! Verify Your Email',
+		text:
+			`Hi ${name.firstName} ${name.lastName},\n\n` +
+			'Welcome to AuctionHub! To complete your registration, please verify your email using the OTP code below:\n\n' +
+			`OTP CODE: ${otp}\n\n` +
+			`⏱️ This OTP will expire in ${expiresIn}.\n\n` +
+			'⚠️ Security Notice:\n' +
+			'- Never share this OTP with anyone\n' +
+			"- If you didn't create this account, please ignore this email\n\n" +
+			'After verification, you can start bidding on amazing items!\n\n' +
+			'Best regards,\n' +
+			'AuctionHub Team',
+	}
+}
+
+/**
  * ✅ NEW: Reset Password OTP Email Template
  * @param data - Object containing otp, expiresIn, and name
  * @returns The reset password OTP email template
@@ -135,6 +161,25 @@ export default function (type: string, data: any): Email | null {
 				'Name data is required for reset OTP email'
 			)
 			message = resetPasswordOtpEmail(data)
+			break
+		case 'register-otp':
+			// ✅ NEW: Handle register-otp template
+			assert(
+				data.otp && typeof data.otp == 'string',
+				'OTP is required for registration OTP email'
+			)
+			assert(
+				data.expiresIn && typeof data.expiresIn == 'string',
+				'Expiry time is required for registration OTP email'
+			)
+			assert(
+				data.name &&
+					typeof data.name == 'object' &&
+					typeof data.name.firstName == 'string' &&
+					typeof data.name.lastName == 'string',
+				'Name data is required for registration OTP email'
+			)
+			message = registrationOtpEmail(data)
 			break
 
 		case 'reset-confirmation':

@@ -15,8 +15,8 @@ import { generateOTPWithExpiry, verifyOTP } from '../../Utility/otp.utils.js'
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY
 
 const authLimiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 5, // 5 attempts per window
+	windowMs: 1, // 15 minutes: 15 * 60 * 1000
+	max: 100, // 5 attempts per window: 5
 	message: 'Too many attempts. Please try again later.',
 	standardHeaders: true,
 	legacyHeaders: false,
@@ -132,7 +132,11 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
 				.status(400)
 				.send({ error: 'No user found for this email address.' })
 		}
-
+		if (!user.isVerified) {
+			return res.status(400).json({
+				error: 'Please verify your email first. Check your inbox for the OTP code.',
+			})
+		}
 		// Ensure user registered via email, not social provider
 		if (user.provider !== EMAIL_PROVIDER.Email) {
 			return res.status(400).send({
@@ -170,6 +174,7 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
 				id: user.id,
 				firstName: user.firstName,
 				lastName: user.lastName,
+				fullName: `${user.firstName} ${user.lastName}`,
 				email: user.email,
 				role: user.role,
 			},
@@ -192,8 +197,14 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
  */
 router.post('/register', authLimiter, async (req: Request, res: Response) => {
 	try {
-		const { email, firstName, lastName, password, recaptchaToken } =
-			req.body
+		const {
+			email,
+			firstName,
+			lastName,
+			password,
+			address,
+			recaptchaToken,
+		} = req.body
 		// Verify reCAPTCHA
 		if (!recaptchaToken) {
 			return res.status(400).json({
@@ -251,22 +262,28 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
 		// Hash password
 		const salt = await bcrypt.genSalt(10)
 		const hash = await bcrypt.hash(password, salt)
-
+		const { otp, expires } = generateOTPWithExpiry()
 		// Create new user
 		const user = new User()
 		user.email = email
 		user.password = hash
 		user.firstName = firstName
 		user.lastName = lastName
-
+		user.address = address
+		user.isVerified = false // ✅ Not verified yet
+		user.otp = otp // ✅ Store OTP
+		user.otpExpires = expires // ✅ Store expiry
 		// Save user to database
 		const registeredUser = await user.save()
 
 		// Send signup email
-		await MailService.sendMail(registeredUser.email, 'signup', {
+		await MailService.sendMail(registeredUser.email, 'register-otp', {
+			otp,
+			expiresIn: '10 minutes',
 			name: { firstName, lastName },
 		})
-
+		console.log('✅ Registration OTP sent to:', email)
+		console.log('🔐 OTP (DEV ONLY):', otp) // ⚠️ Remove in production!
 		// Create JWT token
 		const token = jwt.sign({ id: registeredUser.id }, secret, {
 			expiresIn: tokenLife as any,
@@ -275,14 +292,9 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
 		// Respond with user info and token
 		res.status(200).json({
 			success: true,
-			token: `Bearer ${token}`,
-			user: {
-				id: registeredUser.id,
-				firstName: registeredUser.firstName,
-				lastName: registeredUser.lastName,
-				email: registeredUser.email,
-				role: registeredUser.role,
-			},
+			message:
+				'Registration successful! Please check your email for the OTP code.',
+			email: registeredUser.email, // Send email back for OTP verification step
 		})
 	} catch (error: any) {
 		// Handle errors
@@ -290,6 +302,148 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
 			error:
 				error.message ||
 				'Your request could not be processed. Please try again.',
+		})
+	}
+})
+
+/**
+ * ✅ NEW: Verify registration OTP
+ * @route POST /verify-otp
+ */
+router.post('/verify-otp', authLimiter, async (req: Request, res: Response) => {
+	try {
+		const { email, otpCode } = req.body
+
+		// Validate input
+		if (!email || !otpCode) {
+			return res.status(400).json({
+				error: 'Email and OTP are required.',
+			})
+		}
+
+		// Find user
+		const user = await User.findOne({ email })
+
+		if (!user) {
+			return res.status(400).json({
+				error: 'Invalid email or OTP.',
+			})
+		}
+
+		// Check if already verified
+		if (user.isVerified) {
+			return res.status(400).json({
+				error: 'This account is already verified. Please login.',
+			})
+		}
+
+		// Verify OTP
+		const verification = verifyOTP(user.otp, otpCode, user.otpExpires)
+
+		if (!verification.valid) {
+			return res.status(400).json({
+				error: verification.reason,
+			})
+		}
+
+		// ✅ Mark user as verified
+		user.isVerified = true
+		user.otp = undefined // Clear OTP
+		user.otpExpires = undefined
+		await user.save()
+
+		// ✅ Send welcome email
+		await MailService.sendMail(user.email, 'signup', {
+			name: { firstName: user.firstName, lastName: user.lastName },
+		})
+
+		// ✅ Generate JWT token
+		const token = jwt.sign({ id: user.id }, secret, {
+			expiresIn: tokenLife as any,
+		})
+
+		console.log('✅ User verified and logged in:', email)
+
+		// Respond with user info and token
+		res.status(200).json({
+			success: true,
+			message: 'Email verified successfully! Welcome!',
+			token: `Bearer ${token}`,
+			user: {
+				id: user.id,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				email: user.email,
+				fullName: `${user.firstName} ${user.lastName}`,
+				role: user.role,
+			},
+		})
+	} catch (error: any) {
+		console.error('❌ Verify OTP error:', error)
+		res.status(400).json({
+			error: error.message || 'Failed to verify OTP.',
+		})
+	}
+})
+
+/**
+ * ✅ NEW: Resend registration OTP
+ * @route POST /resend-otp
+ */
+router.post('/resend-otp', authLimiter, async (req: Request, res: Response) => {
+	try {
+		const { email } = req.body
+		console.log('🔵 [RESEND OTP] Request for:', email) // ✅ ADD
+		// Validate input
+		if (!email) {
+			return res.status(400).json({
+				error: 'Email is required.',
+			})
+		}
+
+		// Find user
+		const user = await User.findOne({ email })
+
+		if (!user) {
+			console.log('❌ [RESEND OTP] User not found:', email)
+			return res.status(400).json({
+				error: 'No account found with this email.',
+			})
+		}
+
+		// Check if already verified
+		if (user.isVerified) {
+			console.log('⚠️ [RESEND OTP] Already verified:', email)
+			return res.status(400).json({
+				error: 'This account is already verified. Please login.',
+			})
+		}
+
+		// ✅ Generate new OTP
+		const { otp, expires } = generateOTPWithExpiry()
+
+		user.otp = otp
+		user.otpExpires = expires
+		await user.save()
+
+		// Send OTP email
+		await MailService.sendMail(user.email, 'register-otp', {
+			otp,
+			expiresIn: '10 minutes',
+			name: { firstName: user.firstName, lastName: user.lastName },
+		})
+
+		console.log('✅ OTP resent to:', email)
+		console.log('🔐 OTP (DEV ONLY):', otp)
+
+		res.status(200).json({
+			success: true,
+			message: 'A new OTP has been sent to your email.',
+		})
+	} catch (error: any) {
+		console.error('❌ Resend OTP error:', error)
+		res.status(400).json({
+			error: error.message || 'Failed to resend OTP.',
 		})
 	}
 })
@@ -740,6 +894,7 @@ router.get('/me', Auth, async (req: Request, res: Response) => {
 				id: user.id,
 				firstName: user.firstName,
 				lastName: user.lastName,
+				fullName: `${user.firstName} ${user.lastName}`,
 				email: user.email,
 				role: user.role,
 				provider: user.provider,
@@ -752,6 +907,31 @@ router.get('/me', Auth, async (req: Request, res: Response) => {
 			error:
 				error.message ||
 				'Your request could not be processed. Please try again.',
+		})
+	}
+})
+
+/**
+ * Logout route.
+ * Logs out the current user.
+ *
+ * @route POST /logout
+ */
+router.post('/logout', Auth, async (req: Request, res: Response) => {
+	try {
+		const userId = (req.user as any).id
+		const userEmail = (req.user as any).email
+
+		console.log('✅ User logged out:', { id: userId, email: userEmail })
+
+		res.status(200).json({
+			success: true,
+			message: 'Logged out successfully.',
+		})
+	} catch (error: any) {
+		console.error('❌ Logout error:', error)
+		res.status(400).json({
+			error: error.message || 'Failed to logout.',
 		})
 	}
 })
