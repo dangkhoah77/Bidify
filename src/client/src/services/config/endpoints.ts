@@ -36,6 +36,13 @@ export const API_ENDPOINTS = {
 		BASE: '/categories',
 		DETAIL: (id: string) => `/categories/${id}`,
 	},
+	// Watchlist
+	WATCHLIST: {
+		GET_ALL: '/watchlist',
+		ADD: (productId: string) => `/watchlist/${productId}`,
+		REMOVE: (productId: string) => `/watchlist/${productId}`,
+		CHECK: (productId: string) => `/watchlist/check/${productId}`,
+	},
 
 	// Bids
 	BIDS: {
@@ -52,12 +59,6 @@ export const API_ENDPOINTS = {
 		WON: '/users/won',
 		CHANGE_PASSWORD: '/users/change-password',
 		UPGRADE_REQUEST: '/users/upgrade-request',
-	},
-
-	// Watchlist
-	WATCHLIST: {
-		BASE: '/watchlist',
-		ITEM: (productId: string) => `/watchlist/${productId}`,
 	},
 
 	// Ratings

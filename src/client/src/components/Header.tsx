@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/input/button'
 import { Input } from '@/components/ui/input/input'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -25,7 +25,7 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export const Header = () => {
 	const { user, isAuthenticated, logout } = useAuth()
-
+	const navigate = useNavigate()
 	const categories = [
 		{
 			name: 'Điện tử',
@@ -154,7 +154,7 @@ export const Header = () => {
 								</Button>
 
 								{/* Watchlist */}
-								<Link to="/watchlist">
+								<Link to="/watch-list">
 									<Button
 										variant="ghost"
 										size="icon"
@@ -213,24 +213,6 @@ export const Header = () => {
 											>
 												<User className="mr-2 h-4 w-4" />
 												<span>Hồ sơ của tôi</span>
-											</Link>
-										</DropdownMenuItem>
-										<DropdownMenuItem asChild>
-											<Link
-												to="/watchlist"
-												className="cursor-pointer"
-											>
-												<BookmarkIcon className="mr-2 h-4 w-4" />
-												<span>Danh sách theo dõi</span>
-											</Link>
-										</DropdownMenuItem>
-										<DropdownMenuItem asChild>
-											<Link
-												to="/settings"
-												className="cursor-pointer"
-											>
-												<Settings className="mr-2 h-4 w-4" />
-												<span>Cài đặt</span>
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuSeparator />

@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/input/button'
 import { Link } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { useState } from 'react'
+import { useWatchlist } from '@/contexts/WatchlistContext' // ✅ ADD THIS
+
 interface ProductCardProps {
 	id: string
 	image: string
@@ -37,7 +38,11 @@ export const ProductCard = ({
 	})
 	const isEndingSoon =
 		endTime.getTime() - Date.now() < 3 * 24 * 60 * 60 * 1000 // 3 days
-	const [isFavorite, setIsFavorite] = useState(false)
+
+	// ✅ USE WATCHLIST CONTEXT
+	const { isInWatchlist, toggleWatchlist } = useWatchlist()
+	const isFavorite = isInWatchlist(id)
+
 	return (
 		<Link to={`/product/${id}`}>
 			<Card className="group overflow-hidden transition-all hover:shadow-elevated">
@@ -47,23 +52,30 @@ export const ProductCard = ({
 						alt={title}
 						className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
 					/>
+
+					{/* ✅ FAVORITE BUTTON */}
 					<Button
 						variant="ghost"
 						size="icon"
-						className="absolute right-2 top-2 h-10 w-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-all"
+						className="absolute right-2 top-2 h-10 w-10 rounded-full 
+                                   bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm 
+                                   hover:bg-white dark:hover:bg-gray-800
+                                   transition-all hover:scale-110 active:scale-95
+                                   shadow-md"
 						onClick={(e) => {
 							e.preventDefault()
-							setIsFavorite(!isFavorite)
+							toggleWatchlist(id) // ✅ USE CONTEXT
 						}}
 					>
 						<Heart
 							className={`h-5 w-5 transition-all ${
 								isFavorite
 									? 'fill-red-500 text-red-500'
-									: 'fill-none text-gray-700 hover:text-red-500'
+									: 'fill-none text-gray-700 dark:text-gray-400 hover:text-red-500'
 							}`}
 						/>
 					</Button>
+
 					{isNew && (
 						<Badge className="absolute left-2 top-2 bg-accent text-accent-foreground animate-pulse-slow">
 							MỚI

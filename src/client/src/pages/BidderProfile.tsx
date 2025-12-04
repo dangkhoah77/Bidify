@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { Button } from '@/components/ui/input/button'
 import { Input } from '@/components/ui/input/input'
@@ -23,25 +24,40 @@ import {
 	Star,
 	ThumbsUp,
 	ThumbsDown,
-	Package,
-	Heart,
 	Gavel,
 	Award,
+	ArrowRight,
 } from 'lucide-react'
 import { mockProducts } from '@/lib/mockData'
+import { useAuth } from '@/contexts/AuthContext'
+import { toast } from 'sonner'
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from '../components/ui/overlay/alert-dialog'
 
-export default function Profile() {
+export default function BidderProfile() {
 	const [activeTab, setActiveTab] = useState('info')
+	const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
+	const navigate = useNavigate()
+	const { user } = useAuth()
 
-	// Mock user data
-	const user = {
-		name: 'Nguyễn Văn A',
-		email: 'nguyenvana@example.com',
-		address: '123 Đường ABC, Quận 1, TP.HCM',
+	// Mock user data (replace with real data from AuthContext)
+	const profileUser = {
+		name: user?.firstName + ' ' + user?.lastName || 'Người dùng',
+		email: user?.email || 'user@example.com',
+		address: user?.address || 'Chưa cập nhật',
 		rating: 4.5,
 		totalReviews: 24,
 		positiveReviews: 22,
-		role: 'seller', // bidder or seller - Change to see seller tabs
+		role: user?.role || 'bider',
+		isSeller: user?.role === 'seller' || user?.role === 'admin',
 	}
 
 	const reviews = [
@@ -68,11 +84,24 @@ export default function Profile() {
 		},
 	]
 
-	const watchList = mockProducts.slice(0, 4)
-	const biddingProducts = mockProducts.slice(4, 8)
-	const wonProducts = mockProducts.slice(8, 12)
-	const activeProducts = mockProducts.slice(0, 6)
-	const soldProducts = mockProducts.slice(6, 10)
+	const biddingProducts = mockProducts.slice(0, 4)
+	const wonProducts = mockProducts.slice(4, 8)
+
+	const handleSwitchToSeller = () => {
+		if (profileUser.isSeller) {
+			// User is already a seller, navigate to seller profile
+			navigate('/seller/profile')
+		} else {
+			// Show upgrade request dialog
+			setShowUpgradeDialog(true)
+		}
+	}
+
+	const handleUpgradeRequest = () => {
+		// TODO: Call API to request upgrade
+		toast.success('Yêu cầu nâng cấp đã được gửi. Vui lòng chờ admin duyệt.')
+		setShowUpgradeDialog(false)
+	}
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -80,20 +109,26 @@ export default function Profile() {
 
 			<main className="container py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+					{/* Sidebar */}
 					<div className="lg:col-span-1">
 						<Card>
 							<CardHeader>
 								<div className="flex items-center justify-center mb-4">
 									<div className="h-24 w-24 rounded-full bg-gradient-auction flex items-center justify-center text-4xl font-bold text-white">
-										{user.name.charAt(0)}
+										{profileUser.name.charAt(0)}
 									</div>
 								</div>
 								<CardTitle className="text-center">
-									{user.name}
+									{profileUser.name}
 								</CardTitle>
 								<CardDescription className="text-center">
-									{user.email}
+									{profileUser.email}
 								</CardDescription>
+								<div className="flex justify-center mt-2">
+									<Badge variant="outline">
+										Người đấu giá
+									</Badge>
+								</div>
 							</CardHeader>
 							<CardContent>
 								<div className="space-y-4">
@@ -101,11 +136,11 @@ export default function Profile() {
 										<div className="flex items-center gap-2">
 											<Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
 											<span className="font-semibold">
-												{user.rating}
+												{profileUser.rating}
 											</span>
 										</div>
 										<span className="text-sm text-muted-foreground">
-											{user.totalReviews} đánh giá
+											{profileUser.totalReviews} đánh giá
 										</span>
 									</div>
 
@@ -114,8 +149,8 @@ export default function Profile() {
 											<ThumbsUp className="h-5 w-5 text-green-500" />
 											<span className="font-semibold">
 												{Math.round(
-													(user.positiveReviews /
-														user.totalReviews) *
+													(profileUser.positiveReviews /
+														profileUser.totalReviews) *
 														100
 												)}
 												%
@@ -128,25 +163,29 @@ export default function Profile() {
 
 									<Button
 										variant="outline"
-										className="w-full"
+										className="w-full gap-2"
+										onClick={handleSwitchToSeller}
 									>
-										Yêu cầu nâng cấp Seller
+										{profileUser.isSeller ? (
+											<>
+												Chuyển sang hồ sơ Seller
+												<ArrowRight className="h-4 w-4" />
+											</>
+										) : (
+											'Yêu cầu nâng cấp Seller'
+										)}
 									</Button>
 								</div>
 							</CardContent>
 						</Card>
 					</div>
 
+					{/* Main Content */}
 					<div className="lg:col-span-3">
 						<Tabs value={activeTab} onValueChange={setActiveTab}>
-							<TabsList
-								className={`grid w-full ${user.role === 'seller' ? 'grid-cols-7' : 'grid-cols-5'}`}
-							>
+							<TabsList className="grid w-full grid-cols-4">
 								<TabsTrigger value="info">
 									Thông tin
-								</TabsTrigger>
-								<TabsTrigger value="watchlist">
-									Yêu thích
 								</TabsTrigger>
 								<TabsTrigger value="bidding">
 									Đang đấu giá
@@ -155,18 +194,9 @@ export default function Profile() {
 								<TabsTrigger value="reviews">
 									Đánh giá
 								</TabsTrigger>
-								{user.role === 'seller' && (
-									<>
-										<TabsTrigger value="selling">
-											Đang bán
-										</TabsTrigger>
-										<TabsTrigger value="sold">
-											Đã bán
-										</TabsTrigger>
-									</>
-								)}
 							</TabsList>
 
+							{/* Info Tab */}
 							<TabsContent value="info">
 								<Card>
 									<CardHeader>
@@ -182,7 +212,7 @@ export default function Profile() {
 											</Label>
 											<Input
 												id="name"
-												defaultValue={user.name}
+												defaultValue={profileUser.name}
 											/>
 										</div>
 										<div className="space-y-2">
@@ -190,7 +220,8 @@ export default function Profile() {
 											<Input
 												id="email"
 												type="email"
-												defaultValue={user.email}
+												defaultValue={profileUser.email}
+												disabled
 											/>
 										</div>
 										<div className="space-y-2">
@@ -199,7 +230,9 @@ export default function Profile() {
 											</Label>
 											<Textarea
 												id="address"
-												defaultValue={user.address}
+												defaultValue={
+													profileUser.address
+												}
 											/>
 										</div>
 										<div className="space-y-2">
@@ -225,32 +258,7 @@ export default function Profile() {
 								</Card>
 							</TabsContent>
 
-							<TabsContent value="watchlist">
-								<Card>
-									<CardHeader>
-										<div className="flex items-center gap-2">
-											<Heart className="h-5 w-5" />
-											<CardTitle>
-												Danh sách yêu thích
-											</CardTitle>
-										</div>
-										<CardDescription>
-											Các sản phẩm bạn đang theo dõi
-										</CardDescription>
-									</CardHeader>
-									<CardContent>
-										<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-											{watchList.map((product) => (
-												<ProductCard
-													key={product.id}
-													{...product}
-												/>
-											))}
-										</div>
-									</CardContent>
-								</Card>
-							</TabsContent>
-
+							{/* Bidding Tab */}
 							<TabsContent value="bidding">
 								<Card>
 									<CardHeader>
@@ -277,6 +285,7 @@ export default function Profile() {
 								</Card>
 							</TabsContent>
 
+							{/* Won Tab */}
 							<TabsContent value="won">
 								<Card>
 									<CardHeader>
@@ -301,6 +310,7 @@ export default function Profile() {
 								</Card>
 							</TabsContent>
 
+							{/* Reviews Tab */}
 							<TabsContent value="reviews">
 								<Card>
 									<CardHeader>
@@ -361,71 +371,35 @@ export default function Profile() {
 									</CardContent>
 								</Card>
 							</TabsContent>
-							{user.role === 'seller' && (
-								<>
-									<TabsContent value="selling">
-										<Card>
-											<CardHeader>
-												<div className="flex items-center gap-2">
-													<Package className="h-5 w-5" />
-													<CardTitle>
-														Sản phẩm đang bán
-													</CardTitle>
-												</div>
-												<CardDescription>
-													Các sản phẩm đang trong
-													phiên đấu giá
-												</CardDescription>
-											</CardHeader>
-											<CardContent>
-												<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-													{activeProducts.map(
-														(product) => (
-															<ProductCard
-																key={product.id}
-																{...product}
-															/>
-														)
-													)}
-												</div>
-											</CardContent>
-										</Card>
-									</TabsContent>
-
-									<TabsContent value="sold">
-										<Card>
-											<CardHeader>
-												<div className="flex items-center gap-2">
-													<Award className="h-5 w-5" />
-													<CardTitle>
-														Sản phẩm đã bán
-													</CardTitle>
-												</div>
-												<CardDescription>
-													Các sản phẩm đã kết thúc đấu
-													giá
-												</CardDescription>
-											</CardHeader>
-											<CardContent>
-												<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-													{soldProducts.map(
-														(product) => (
-															<ProductCard
-																key={product.id}
-																{...product}
-															/>
-														)
-													)}
-												</div>
-											</CardContent>
-										</Card>
-									</TabsContent>
-								</>
-							)}
 						</Tabs>
 					</div>
 				</div>
 			</main>
+
+			{/* Upgrade Request Dialog */}
+			<AlertDialog
+				open={showUpgradeDialog}
+				onOpenChange={setShowUpgradeDialog}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							Yêu cầu nâng cấp lên Seller
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							Bạn chưa được nâng cấp lên Seller. Bạn có muốn gửi
+							yêu cầu nâng cấp tài khoản không? Admin sẽ xem xét
+							và phê duyệt trong thời gian sớm nhất.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Hủy</AlertDialogCancel>
+						<AlertDialogAction onClick={handleUpgradeRequest}>
+							Gửi yêu cầu
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	)
 }
