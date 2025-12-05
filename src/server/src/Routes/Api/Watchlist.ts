@@ -17,6 +17,20 @@ router.get('/', Auth, async (req: Request, res: Response) => {
 			.populate({
 				path: 'watchlist',
 				model: 'Product',
+				populate: [
+					// ✅ NESTED POPULATE FOR CATEGORY
+					{
+						path: 'category',
+						model: 'Category',
+						select: 'name',
+					},
+					// ✅ NESTED POPULATE FOR HIGHEST BIDDER
+					{
+						path: 'highestBidder',
+						model: 'User',
+						select: 'firstName lastName',
+					},
+				],
 			})
 			.lean()
 
@@ -24,8 +38,8 @@ router.get('/', Auth, async (req: Request, res: Response) => {
 			return res.status(404).json({ error: 'User not found.' })
 		}
 
-		// Map products to DTO format
-		const watchlist = (user.watchlist as any[]).map((product) => ({
+		// ✅ MAP WITH CATEGORY AND BIDDER INFO
+		const mapDocToDTO = (product: any) => ({
 			_id: product._id.toString(),
 			name: product.name,
 			description: product.description,
@@ -36,8 +50,14 @@ router.get('/', Auth, async (req: Request, res: Response) => {
 			buyNowPrice: product.buyNowPrice,
 			endTime: product.endTime.toISOString(),
 			bidCount: product.bidCount ?? 0,
+			categoryName: product.category?.name || 'Chưa phân loại', // ✅ FIXED
+			highestBidderName: product.highestBidder
+				? `****${product.highestBidder.lastName || product.highestBidder.firstName || ''}`
+				: 'Chưa có',
 			isNew: false,
-		}))
+		})
+
+		const watchlist = (user.watchlist as any[]).map(mapDocToDTO)
 
 		return res.json({
 			watchlist,
@@ -60,6 +80,10 @@ router.post('/:productId', Auth, async (req: Request, res: Response) => {
 		const userId = (req.user as any)._id
 		const { productId } = req.params
 
+		console.log(
+			`[Watchlist] Adding product ${productId} for user ${userId}`
+		) // ✅ DEBUG LOG
+
 		// Check if product exists
 		const product = await Product.findById(productId)
 		if (!product) {
@@ -72,7 +96,8 @@ router.post('/:productId', Auth, async (req: Request, res: Response) => {
 			return res.status(404).json({ error: 'User not found.' })
 		}
 
-		if (user.watchlist.includes(productId as any)) {
+		// ✅ IMPROVED CHECK: Use .some() instead of .includes()
+		if (user.watchlist.some((id) => id.toString() === productId)) {
 			return res.status(400).json({
 				error: 'Product already in watchlist.',
 			})
@@ -81,13 +106,17 @@ router.post('/:productId', Auth, async (req: Request, res: Response) => {
 		user.watchlist.push(productId as any)
 		await user.save()
 
+		console.log(
+			`[Watchlist] Successfully added. Total: ${user.watchlist.length}`
+		) // ✅ DEBUG LOG
+
 		return res.json({
 			success: true,
 			message: 'Product added to watchlist.',
 			watchlistCount: user.watchlist.length,
 		})
 	} catch (error: any) {
-		console.error('Add to watchlist error:', error)
+		console.error('[Watchlist] Add error:', error)
 		return res.status(500).json({
 			error: error.message || 'Failed to add to watchlist.',
 		})
@@ -103,6 +132,10 @@ router.delete('/:productId', Auth, async (req: Request, res: Response) => {
 		const userId = (req.user as any)._id
 		const { productId } = req.params
 
+		console.log(
+			`[Watchlist] Removing product ${productId} for user ${userId}`
+		) // ✅ DEBUG LOG
+
 		const user = await User.findById(userId)
 		if (!user) {
 			return res.status(404).json({ error: 'User not found.' })
@@ -114,13 +147,17 @@ router.delete('/:productId', Auth, async (req: Request, res: Response) => {
 		)
 		await user.save()
 
+		console.log(
+			`[Watchlist] Successfully removed. Total: ${user.watchlist.length}`
+		) // ✅ DEBUG LOG
+
 		return res.json({
 			success: true,
 			message: 'Product removed from watchlist.',
 			watchlistCount: user.watchlist.length,
 		})
 	} catch (error: any) {
-		console.error('Remove from watchlist error:', error)
+		console.error('[Watchlist] Remove error:', error)
 		return res.status(500).json({
 			error: error.message || 'Failed to remove from watchlist.',
 		})
@@ -150,7 +187,7 @@ router.get('/check/:productId', Auth, async (req: Request, res: Response) => {
 			productId,
 		})
 	} catch (error: any) {
-		console.error('Check watchlist error:', error)
+		console.error('[Watchlist] Check error:', error)
 		return res.status(500).json({
 			error: error.message || 'Failed to check watchlist.',
 		})
