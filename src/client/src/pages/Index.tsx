@@ -1,27 +1,12 @@
-import { Header } from '@/components/Header'
-import { ProductCard } from '@/components/ProductCard'
-import { Button } from '@/components/ui/input/button'
-import { Badge } from '@/components/ui/data-display/badge'
+import { Header } from '../components/Header'
+import { ProductCard } from '../components/ProductCard'
+import { Button } from '../components/ui/input/button'
+import { Badge } from '../components/ui/data-display/badge'
 import { TrendingUp, Clock, DollarSign, Sparkles } from 'lucide-react'
-// import { useHomeProducts } from '@/app/containers/Products/useHomeProducts'
-import { useHomeProducts } from '@/services'
-// import { mockProducts } from '@/lib/mockData'
+import { Link } from 'react-router-dom'
+import { useHomeProducts } from '../services/utils/products.hooks'
 
 const Index = () => {
-	// Sort products for different sections (Mock data)
-	// const endingSoon = [...mockProducts]
-	// 	.sort((a, b) => a.endTime.getTime() - b.endTime.getTime())
-	// 	.slice(0, 5)
-
-	// const mostBids = [...mockProducts]
-	// 	.sort((a, b) => b.bidCount - a.bidCount)
-	// 	.slice(0, 5)
-
-	// const highestPrice = [...mockProducts]
-	// 	.sort((a, b) => b.currentPrice - a.currentPrice)
-	// 	.slice(0, 5)
-
-	//Sử dụng data từ backend
 	const { data, isLoading, isError } = useHomeProducts()
 
 	const endingSoon = data?.endingSoon ?? []
@@ -122,7 +107,10 @@ const Index = () => {
 								</p>
 							</div>
 						</div>
-						<Button variant="ghost">Xem tất cả →</Button>
+						{/* ✅ CHỈ GIỮ 1 NÚT "XEM TẤT CẢ" */}
+						<Link to="/products/ending-soon">
+							<Button variant="ghost">Xem tất cả →</Button>
+						</Link>
 					</div>
 
 					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
@@ -148,7 +136,10 @@ const Index = () => {
 								</p>
 							</div>
 						</div>
-						<Button variant="ghost">Xem tất cả →</Button>
+						{/* ✅ CHỈ GIỮ 1 NÚT "XEM TẤT CẢ" */}
+						<Link to="/products/most-bids">
+							<Button variant="ghost">Xem tất cả →</Button>
+						</Link>
 					</div>
 
 					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
@@ -174,7 +165,10 @@ const Index = () => {
 								</p>
 							</div>
 						</div>
-						<Button variant="ghost">Xem tất cả →</Button>
+						{/* ✅ CHỈ GIỮ 1 NÚT "XEM TẤT CẢ" */}
+						<Link to="/products/highest-price">
+							<Button variant="ghost">Xem tất cả →</Button>
+						</Link>
 					</div>
 
 					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
@@ -183,6 +177,7 @@ const Index = () => {
 						))}
 					</div>
 				</section>
+
 				{/* CTA Section */}
 				<section className="rounded-2xl bg-gradient-auction p-12 text-center text-white">
 					<div className="mx-auto max-w-2xl space-y-6">

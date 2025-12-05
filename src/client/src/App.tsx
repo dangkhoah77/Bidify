@@ -26,6 +26,7 @@ import VerifyOTP from './pages/VerifyOTP'
 import WatchList from './pages/WatchList'
 import BidderProfile from './pages/BidderProfile'
 import SellerProfile from './pages/SellerProfile'
+import { ProductsList } from './pages/ProductsList'
 // Admin pages
 import AdminCategories from './pages/admin/AdminCategories'
 import AdminProducts from './pages/admin/AdminProducts'
@@ -58,6 +59,10 @@ const App = () => (
 								<Route
 									path="/category/:category"
 									element={<CategoryProducts />}
+								/>
+								<Route
+									path="/products/:type"
+									element={<ProductsList />}
 								/>
 								<Route path="/search" element={<Search />} />
 

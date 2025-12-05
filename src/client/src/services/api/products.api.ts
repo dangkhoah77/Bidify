@@ -4,6 +4,7 @@ import type {
 	ProductDTO,
 	HomeProductsResponse,
 	ProductsByCategoryNameResponse,
+	ProductsListResponse,
 } from '../types/product.types'
 
 /**
@@ -28,10 +29,35 @@ export async function fetchProductsByCategoryName(
 	return response.data
 }
 
-// ✅ Có thể thêm các API khác sau:
-// export async function fetchProductDetail(id: string): Promise<ProductDTO> {
-//   const response = await apiClient.get<ProductDTO>(
-//     API_ENDPOINTS.PRODUCTS.DETAIL(id)
-//   )
-//   return response.data
-// }
+export async function fetchEndingSoonProducts(
+	page: number = 1,
+	limit: number = 20
+): Promise<ProductsListResponse> {
+	const response = await apiClient.get<ProductsListResponse>(
+		API_ENDPOINTS.PRODUCTS.ENDING_SOON,
+		{ params: { page, limit } }
+	)
+	return response.data
+}
+
+export async function fetchMostBidsProducts(
+	page: number = 1,
+	limit: number = 20
+): Promise<ProductsListResponse> {
+	const response = await apiClient.get<ProductsListResponse>(
+		API_ENDPOINTS.PRODUCTS.MOST_BIDS,
+		{ params: { page, limit } }
+	)
+	return response.data
+}
+
+export async function fetchHighestPriceProducts(
+	page: number = 1,
+	limit: number = 20
+): Promise<ProductsListResponse> {
+	const response = await apiClient.get<ProductsListResponse>(
+		API_ENDPOINTS.PRODUCTS.HIGHEST_PRICE,
+		{ params: { page, limit } }
+	)
+	return response.data
+}
