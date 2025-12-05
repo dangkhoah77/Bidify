@@ -79,6 +79,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 				setAccessToken(token)
 				setUser(response.user) // Sửa: response.user thay vì response.data.user
+				console.log(response.user)
 				toast.success('Đăng nhập thành công!')
 				navigate('/')
 			}

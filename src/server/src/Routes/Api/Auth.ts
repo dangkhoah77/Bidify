@@ -176,6 +176,7 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
 				lastName: user.lastName,
 				fullName: `${user.firstName} ${user.lastName}`,
 				email: user.email,
+				address: user.address,
 				role: user.role,
 			},
 		})
@@ -375,6 +376,7 @@ router.post('/verify-otp', authLimiter, async (req: Request, res: Response) => {
 				lastName: user.lastName,
 				email: user.email,
 				fullName: `${user.firstName} ${user.lastName}`,
+				address: user.address,
 				role: user.role,
 			},
 		})
