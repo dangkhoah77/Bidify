@@ -80,7 +80,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				setAccessToken(token)
 				setUser(response.user) // Sửa: response.user thay vì response.data.user
 				toast.success('Đăng nhập thành công!')
-				navigate('/')
+				switch (response.user.role) {
+					case 'ROLE ADMIN':
+						navigate('/admin/users')
+						break
+					case 'ROLE SELLER':
+						navigate('/seller/products')
+						break
+					case 'ROLE BIDER': // Typo của backend
+						navigate('/')
+						break
+					default:
+						navigate('/')
+				}
 			}
 		} catch (error: unknown) {
 			toast.error(getErrorMessage(error))

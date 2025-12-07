@@ -38,11 +38,11 @@ export const ProtectedRoute = ({
 	// Check if user has required roles
 	if (allowedRoles && user) {
 		const hasRequiredRole = allowedRoles.some((role) =>
-			user.roles.includes(role)
+			user.role.includes(role)
 		)
 
 		if (!hasRequiredRole) {
-			console.log('⚠️ Insufficient permissions, user roles:', user.roles)
+			console.log('⚠️ Insufficient permissions, user roles:', user.role)
 			console.log('Required roles:', allowedRoles)
 			// Redirect to home with error message
 			return <Navigate to="/" replace />
