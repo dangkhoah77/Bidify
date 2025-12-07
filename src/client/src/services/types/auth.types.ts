@@ -65,7 +65,7 @@ export interface User {
 	dateOfBirth?: Date | string
 	avatar?: string
 	role?: string
-	roles?: UserRole[]
+	// roles?: UserRole[]
 	isEmailVerified: boolean
 	rating: UserRating
 	upgradeRequest?: UpgradeRequest
@@ -93,10 +93,10 @@ export interface UpgradeRequest {
 // ============================================
 
 export enum UserRole {
-	GUEST = 'guest',
-	BIDDER = 'bidder',
-	SELLER = 'seller',
-	ADMIN = 'admin',
+	ADMIN = 'ROLE ADMIN',
+	BIDER = 'ROLE BIDER',
+	SELLER = 'ROLE SELLER',
+	GUEST = 'ROLE GUEST',
 }
 
 export enum UpgradeStatus {
@@ -171,7 +171,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 			actions: [PermissionAction.READ],
 		},
 	],
-	[UserRole.BIDDER]: [
+	[UserRole.BIDER]: [
 		{
 			resource: 'products',
 			actions: [PermissionAction.READ],
