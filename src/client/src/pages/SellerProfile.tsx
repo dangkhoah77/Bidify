@@ -34,7 +34,19 @@ import { useAuth } from '@/contexts/AuthContext'
 export default function SellerProfile() {
 	const [activeTab, setActiveTab] = useState('info')
 	const navigate = useNavigate()
-	const { user } = useAuth()
+	const { user, isLoading } = useAuth()
+	if (isLoading) {
+		return (
+			<div className="min-h-screen bg-background">
+				<Header />
+				<main className="container py-8">
+					<div className="flex items-center justify-center h-64">
+						<p className="text-muted-foreground">Đang tải...</p>
+					</div>
+				</main>
+			</div>
+		)
+	}
 
 	// Mock user data
 	const profileUser = {

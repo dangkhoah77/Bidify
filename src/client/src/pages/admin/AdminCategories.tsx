@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/overlay/dialog'
 import { Label } from '@/components/ui/input/label'
 import { Plus, Edit, Trash2 } from 'lucide-react'
-
+import { AdminHeader } from './AdminHeader'
 export default function AdminCategories() {
 	const [categories, setCategories] = useState([
 		{ id: 1, name: 'Điện tử', parent: null, productCount: 45 },
@@ -51,7 +51,7 @@ export default function AdminCategories() {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<Header />
+			<AdminHeader />
 
 			<main className="container py-8">
 				<div className="flex items-center justify-between mb-8">

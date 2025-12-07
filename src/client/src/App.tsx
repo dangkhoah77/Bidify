@@ -26,6 +26,7 @@ import VerifyOTP from './pages/VerifyOTP'
 import WatchList from './pages/WatchList'
 import BidderProfile from './pages/BidderProfile'
 import SellerProfile from './pages/SellerProfile'
+import AdminProfile from './pages/admin/AdminProfile'
 import { ProductsList } from './pages/ProductsList'
 // Admin pages
 import AdminCategories from './pages/admin/AdminCategories'
@@ -108,6 +109,17 @@ const App = () => (
 											]}
 										>
 											<SellerProfile />
+										</ProtectedRoute>
+									}
+								/>
+								{/* ✅ NEW: ADMIN PROFILE - Only for admins */}
+								<Route
+									path="/admin/profile"
+									element={
+										<ProtectedRoute
+											allowedRoles={[UserRole.ADMIN]}
+										>
+											<AdminProfile />
 										</ProtectedRoute>
 									}
 								/>

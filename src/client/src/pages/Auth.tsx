@@ -18,7 +18,7 @@ import {
 } from '../components/ui/navigation/tabs'
 import { Checkbox } from '../components/ui/input/checkbox'
 import { useAuth } from '@/contexts/AuthContext'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY || ''
@@ -212,6 +212,18 @@ export default function Auth() {
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-amber-50 p-4">
+			{/* ✅ NEW: Back Button */}
+			<div className="absolute top-4 left-4">
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={() => navigate('/')}
+					className="gap-2"
+				>
+					<ArrowLeft className="h-4 w-4" />
+					Quay lại trang chủ
+				</Button>
+			</div>
 			<Card className="w-full max-w-md">
 				<CardHeader className="text-center">
 					<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-amber-500">

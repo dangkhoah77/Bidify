@@ -23,7 +23,7 @@ import {
 import { Input } from '@/components/ui/input/input'
 import { useToast } from '@/hooks/use-toast'
 import { Settings, Clock, Timer } from 'lucide-react'
-
+import { AdminHeader } from './AdminHeader'
 const settingsSchema = z.object({
 	triggerMinutes: z.coerce
 		.number()
@@ -63,7 +63,7 @@ const AdminAuctionSettings = () => {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<Header />
+			<AdminHeader />
 			<main className="container py-8">
 				<div className="mb-8">
 					<h1 className="text-3xl font-bold tracking-tight mb-2">

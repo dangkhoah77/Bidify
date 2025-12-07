@@ -46,7 +46,19 @@ export default function BidderProfile() {
 	const [activeTab, setActiveTab] = useState('info')
 	const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
 	const navigate = useNavigate()
-	const { user } = useAuth()
+	const { user, isLoading } = useAuth()
+	if (isLoading) {
+		return (
+			<div className="min-h-screen bg-background">
+				<Header />
+				<main className="container py-8">
+					<div className="flex items-center justify-center h-64">
+						<p className="text-muted-foreground">Đang tải...</p>
+					</div>
+				</main>
+			</div>
+		)
+	}
 
 	// Mock user data (replace with real data from AuthContext)
 	const profileUser = {
@@ -56,8 +68,8 @@ export default function BidderProfile() {
 		rating: 4.5,
 		totalReviews: 24,
 		positiveReviews: 22,
-		role: user?.role || 'bider',
-		isSeller: user?.role === 'seller' || user?.role === 'admin',
+		role: user?.role || 'ROLE BIDER',
+		isSeller: user?.role === 'ROLE SELLER',
 	}
 
 	const reviews = [

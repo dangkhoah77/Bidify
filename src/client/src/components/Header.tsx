@@ -71,6 +71,26 @@ export const Header = () => {
 		return user?.fullName || 'User'
 	}
 
+	// ✅ NEW: Function to get profile route based on user role
+	const getProfileRoute = () => {
+		if (!user?.role) return '/profile'
+
+		switch (user.role) {
+			case 'ROLE ADMIN':
+				return '/admin/profile'
+			case 'ROLE SELLER':
+				return '/seller/profile'
+			case 'ROLE BIDER':
+			default:
+				return '/profile'
+		}
+	}
+
+	// ✅ NEW: Handler for profile navigation
+	const handleProfileClick = () => {
+		navigate(getProfileRoute())
+	}
+
 	return (
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex h-16 items-center justify-between">
@@ -206,14 +226,13 @@ export const Header = () => {
 											</div>
 										</div>
 										<DropdownMenuSeparator />
-										<DropdownMenuItem asChild>
-											<Link
-												to="/profile"
-												className="cursor-pointer"
-											>
-												<User className="mr-2 h-4 w-4" />
-												<span>Hồ sơ của tôi</span>
-											</Link>
+										{/* ✅ CHANGED: Use onClick handler instead of Link */}
+										<DropdownMenuItem
+											onClick={handleProfileClick}
+											className="cursor-pointer"
+										>
+											<User className="mr-2 h-4 w-4" />
+											<span>Hồ sơ của tôi</span>
 										</DropdownMenuItem>
 										<DropdownMenuSeparator />
 										<DropdownMenuItem

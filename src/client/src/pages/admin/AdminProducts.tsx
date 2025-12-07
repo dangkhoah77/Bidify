@@ -18,11 +18,11 @@ import {
 import { Badge } from '@/components/ui/data-display/badge'
 import { Eye, Trash2 } from 'lucide-react'
 import { mockProducts } from '@/lib/mockData'
-
+import { AdminHeader } from './AdminHeader'
 export default function AdminProducts() {
 	return (
 		<div className="min-h-screen bg-background">
-			<Header />
+			<AdminHeader />
 
 			<main className="container py-8">
 				<div className="mb-8">

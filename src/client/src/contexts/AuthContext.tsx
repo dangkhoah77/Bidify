@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				toast.success('Đăng nhập thành công!')
 				switch (response.user.role) {
 					case 'ROLE ADMIN':
-						navigate('/admin/users')
+						navigate('/admin/categories')
 						break
 					case 'ROLE SELLER':
 						navigate('/seller/products')
@@ -176,12 +176,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			removeAccessToken()
 			setUser(null)
 			toast.success('Đăng xuất thành công')
-			navigate('/auth')
+			navigate('/')
 		} catch (error) {
 			// Still logout even if API call fails
 			removeAccessToken()
 			setUser(null)
-			navigate('/auth')
+			navigate('/')
 		}
 	}
 

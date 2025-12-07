@@ -23,7 +23,7 @@ import {
 	TabsTrigger,
 } from '@/components/ui/navigation/tabs'
 import { Eye, CheckCircle, XCircle } from 'lucide-react'
-
+import { AdminHeader } from './AdminHeader'
 export default function AdminUsers() {
 	const users = [
 		{
@@ -71,7 +71,7 @@ export default function AdminUsers() {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<Header />
+			<AdminHeader />
 
 			<main className="container py-8">
 				<div className="mb-8">
