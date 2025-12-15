@@ -1,20 +1,24 @@
 import * as React from 'react'
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
-import {
-	Controller,
-	ControllerProps,
-	FieldPath,
-	FieldValues,
-	FormProvider,
-	useFormContext,
-} from 'react-hook-form'
+import { Controller, FormProvider, useFormContext } from 'react-hook-form'
+import { ControllerProps, FieldPath, FieldValues } from 'react-hook-form'
 
-import { cn } from '@/lib/utils'
-import { Label } from '@/components/ui/input/label'
+import { cn } from 'Client/Utility/index.js'
+import { Label } from 'Client/Components/UI/input/label.js'
 
+/**
+ * Form Component.
+ * Provides context for managing form state and validation.
+ */
 const Form = FormProvider
 
+/**
+ * Context value type for FormField.
+ *
+ * @template TFieldValues - The type of the form's field values.
+ * @template TName - The specific field name within the form.
+ */
 type FormFieldContextValue<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -22,6 +26,9 @@ type FormFieldContextValue<
 	name: TName
 }
 
+/**
+ * Context for managing individual form field state.
+ */
 const FormFieldContext = React.createContext<FormFieldContextValue>(
 	{} as FormFieldContextValue
 )

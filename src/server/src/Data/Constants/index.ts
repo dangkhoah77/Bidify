@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream:src/server/src/Data/Constants/index.ts
 /**
  * Defines the roles for users in the system.
  *
@@ -80,3 +81,8 @@ export enum EMAIL_PROVIDER {
  * @constant {string} JWT_COOKIE
  */
 export const JWT_COOKIE = 'x-jwt-cookie'
+=======
+export * from './consts_User.js'
+export * from './consts_Bid.js'
+export * from './consts_Review.js'
+>>>>>>> Stashed changes:src/shared/src/Data/Constants/index.ts

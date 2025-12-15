@@ -1,138 +1,69 @@
 import assert from 'assert'
-import type { Name, Email } from '../../Data/Types/index.js'
+
+import Keys from 'Server/Config/Keys.js'
+import { Mail } from 'Shared/Data/Types/index.js'
 
 /**
- * Reset Password Email Template
+ * Reset Password Mail Template
  *
  * @param resetToken - The reset token for the user
- * @returns The reset password email template
+ * @returns The reset password mail template
  */
-function resetPasswordEmail(resetToken: string): Email {
+function resetPasswordEmail(resetToken: string): Mail {
 	return {
 		subject: 'Reset Password',
 		text:
 			'You are receiving this because you have requested to reset your password for your account.\n\n' +
 			'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-			`https://reset-password/${resetToken}\n\n` +
-			'If you did not request this, please ignore this email and your password will remain unchanged.\n',
+			`http:/${Keys.host}/reset-password/${resetToken}\n\n` +
+			'If you did not request this, please ignore this mail and your password will remain unchanged.\n',
 	}
 }
 
 /**
- * ✅ NEW: Registration OTP Email Template
- */
-function registrationOtpEmail(data: {
-	otp: string
-	expiresIn: string
-	name: Name
-}): Email {
-	const { otp, expiresIn, name } = data
-
-	return {
-		subject: '🎉 Welcome! Verify Your Email',
-		text:
-			`Hi ${name.firstName} ${name.lastName},\n\n` +
-			'Welcome to AuctionHub! To complete your registration, please verify your email using the OTP code below:\n\n' +
-			`OTP CODE: ${otp}\n\n` +
-			`⏱️ This OTP will expire in ${expiresIn}.\n\n` +
-			'⚠️ Security Notice:\n' +
-			'- Never share this OTP with anyone\n' +
-			"- If you didn't create this account, please ignore this email\n\n" +
-			'After verification, you can start bidding on amazing items!\n\n' +
-			'Best regards,\n' +
-			'AuctionHub Team',
-	}
-}
-
-/**
- * ✅ NEW: Reset Password OTP Email Template
- * @param data - Object containing otp, expiresIn, and name
- * @returns The reset password OTP email template
- */
-function resetPasswordOtpEmail(data: {
-	otp: string
-	expiresIn: string
-	name: Name
-}): Email {
-	const { otp, expiresIn, name } = data
-
-	return {
-		subject: '🔐 Password Reset - OTP Verification',
-		text:
-			`Hi ${name.firstName} ${name.lastName},\n\n` +
-			'You requested to reset your password. Use the OTP code below to continue:\n\n' +
-			`OTP CODE: ${otp}\n\n` +
-			`⏱️ This OTP will expire in ${expiresIn}.\n\n` +
-			'⚠️ Security Notice:\n' +
-			'- Never share this OTP with anyone\n' +
-			'- AuctionHub staff will never ask for your OTP\n' +
-			"- If you didn't request this, please secure your account immediately\n\n" +
-			"If you didn't request a password reset, you can safely ignore this email.\n\n" +
-			'Best regards,\n' +
-			'AuctionHub Team',
-	}
-}
-
-/**
- * Confirmation Email Template after Password Reset
+ * Confirmation Mail Template after Password Reset
  *
- * @returns The confirmation email template after password reset
+ * @returns The confirmation mail template after password reset
  */
-function confirmResetPasswordEmail(): Email {
+function confirmResetPasswordEmail(): Mail {
 	return {
 		subject: 'Password Changed',
 		text:
-			'You are receiving this email because you changed your password. \n\n' +
+			'You are receiving this mail because you changed your password. \n\n' +
 			'If you did not request this change, please contact us immediately.',
 	}
 }
 
 /**
- * Signup Email Template
+ * Signup Mail Template
  *
- * @param name - The name of the user
- * @returns The signup email template
+ * @param username - The username of the user
+ * @returns The signup mail template
  */
-function signupEmail(name: Name): Email {
+function signupEmail(username: string): Mail {
 	return {
 		subject: 'Account Registration',
-		text: `Hi ${name.firstName} ${name.lastName}! Thank you for creating an account with us!.`,
+		text: `Hi ${username}! Thank you for creating an account with us!.`,
 	}
 }
 
 /**
- * Contact Email Template
+ * Prepare mail template based on type
  *
- * @returns The contact email template
+ * @param type - type of mail
+ * @param data - Data for the mail
+ * @returns The prepared mail template or null if type is unknown
  */
-function contactEmail(): Email {
-	return {
-		subject: 'Contact Us',
-		text: 'We received your message! Our team will contact you soon. \n\n',
-	}
-}
-
-/**
- * Prepare email template based on type
- *
- * @private
- * @param type - type of email
- * @param data - Data for the email
- * @returns The prepared email template or null if type is unknown
- */
-export default function (type: string, data: any): Email | null {
-	let message: Email | null = null
+export default function (type: string, data: any): Mail | null {
+	let message: Mail | null = null
 
 	switch (type) {
 		case 'signup':
 			assert(
-				data.name &&
-					typeof data.name == 'object' &&
-					typeof data.name.firstName == 'string' &&
-					typeof data.name.lastName == 'string',
-				'Name data is required for signup email'
+				data.username && typeof data.username == 'string',
+				'Name data is required for signup mail'
 			)
-			message = signupEmail(data.name)
+			message = signupEmail(data.username)
 			break
 
 		case 'reset':
@@ -143,55 +74,12 @@ export default function (type: string, data: any): Email | null {
 			message = resetPasswordEmail(data.resetToken)
 			break
 
-		case 'reset-otp':
-			// ✅ NEW: Handle reset-otp template
-			assert(
-				data.otp && typeof data.otp == 'string',
-				'OTP is required for reset OTP email'
-			)
-			assert(
-				data.expiresIn && typeof data.expiresIn == 'string',
-				'Expiry time is required for reset OTP email'
-			)
-			assert(
-				data.name &&
-					typeof data.name == 'object' &&
-					typeof data.name.firstName == 'string' &&
-					typeof data.name.lastName == 'string',
-				'Name data is required for reset OTP email'
-			)
-			message = resetPasswordOtpEmail(data)
-			break
-		case 'register-otp':
-			// ✅ NEW: Handle register-otp template
-			assert(
-				data.otp && typeof data.otp == 'string',
-				'OTP is required for registration OTP email'
-			)
-			assert(
-				data.expiresIn && typeof data.expiresIn == 'string',
-				'Expiry time is required for registration OTP email'
-			)
-			assert(
-				data.name &&
-					typeof data.name == 'object' &&
-					typeof data.name.firstName == 'string' &&
-					typeof data.name.lastName == 'string',
-				'Name data is required for registration OTP email'
-			)
-			message = registrationOtpEmail(data)
-			break
-
 		case 'reset-confirmation':
 			message = confirmResetPasswordEmail()
 			break
 
-		case 'contact':
-			message = contactEmail()
-			break
-
 		default:
-			console.warn(`Unknown email type: ${type}`)
+			console.warn(`Unknown mail type: ${type}`)
 	}
 
 	return message

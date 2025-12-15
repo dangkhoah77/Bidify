@@ -1,4 +1,4 @@
-import type { Express } from 'express'
+import { Express } from 'express'
 import passport from 'passport'
 import mongoose from 'mongoose'
 import JwtPassport from 'passport-jwt'
@@ -6,7 +6,7 @@ import JwtPassport from 'passport-jwt'
 import Keys from './Keys.js'
 
 const User = mongoose.model('User')
-const Secret = Keys.jwt.secret as string
+const Secret = Keys.jwt.secret
 
 /**
  * JWT strategy options for Passport.

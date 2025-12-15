@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express'
 
 /**
  * Middleware generator to check if the user has one of the specified roles.
@@ -13,8 +13,11 @@ export function check(...roles: string[]) {
 			return res.status(401).send('Unauthorized')
 		}
 
+		// Type assertion for user object
+		const user = req.user as { role: string }
+
 		// Return a 403 Forbidden response if the user's role is not valid
-		if (!roles.includes((req.user as any).role)) {
+		if (roles.length != 0 && !roles.includes(user.role)) {
 			return res
 				.status(403)
 				.send('You are not allowed to make this request.')

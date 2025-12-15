@@ -1,240 +1,144 @@
-import { Toaster } from '@/components/ui/feedback/toaster'
-import { Toaster as Sonner } from '@/components/ui/feedback/sonner'
-import { TooltipProvider } from '@/components/ui/overlay/tooltip'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { PublicRoute } from '@/components/auth/PublicRoute'
-import { UserRole } from '@/services/types/auth.types'
-import { RecaptchaProvider } from '@/components/providers/RecaptchaProvider'
-import { WatchlistProvider } from './contexts/WatchlistContext'
-// Pages
-import Index from './pages/Index'
-import ProductDetail from './pages/ProductDetail'
-import Auth from './pages/Auth'
-import CategoryProducts from './pages/CategoryProducts'
-import Search from './pages/Search'
+import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
-import CreateProduct from './pages/CreateProduct'
-import SellerProducts from './pages/SellerProducts'
-import EditProductDescription from './pages/EditProductDescription'
-import OrderCompletion from './pages/OrderCompletion'
-import NotFound from './pages/NotFound'
-import ForgotPassword from './pages/ForgotPassword'
-import VerifyOTP from './pages/VerifyOTP'
-import WatchList from './pages/WatchList'
-import BidderProfile from './pages/BidderProfile'
-import SellerProfile from './pages/SellerProfile'
-import AdminProfile from './pages/admin/AdminProfile'
-import { ProductsList } from './pages/ProductsList'
-// Admin pages
-import AdminCategories from './pages/admin/AdminCategories'
-import AdminProducts from './pages/admin/AdminProducts'
-import AdminUsers from './pages/admin/AdminUsers'
-import AdminAuctionSettings from './pages/admin/AdminAuctionSettings'
+// Providers
+import { PageProvider } from 'Client/Contexts/Page/index.js'
+import { AuthProvider } from 'Client/Contexts/Auth/index.js'
+import { SocketProvider } from 'Client/Contexts/Socket/index.js'
 
-const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			refetchOnWindowFocus: false,
-			retry: 1,
-		},
-	},
-})
+// Layouts
+import MainLayout from 'Client/Layouts/MainLayout.js'
+import AdminLayout from 'Client/Layouts/AdminLayout.js' // Assumed created in Phase 7 steps
 
-const App = () => (
-	<QueryClientProvider client={queryClient}>
-		<TooltipProvider>
-			<RecaptchaProvider>
-				<BrowserRouter>
-					<AuthProvider>
-						<WatchlistProvider>
-							<Routes>
-								{/* Public Routes - Anyone can access */}
-								<Route path="/" element={<Index />} />
-								<Route
-									path="/product/:id"
-									element={<ProductDetail />}
-								/>
-								<Route
-									path="/category/:category"
-									element={<CategoryProducts />}
-								/>
-								<Route
-									path="/products/:type"
-									element={<ProductsList />}
-								/>
-								<Route path="/search" element={<Search />} />
+// Components
+import ProtectedRoute from 'Client/Components/Common/ProtectedRoute.js'
 
-								{/* Auth Route - Redirect to home if already logged in */}
+// --- Containers ---
+
+// Auth
+import LoginContainer from 'Client/Containers/Auth/Login.js'
+import RegisterContainer from 'Client/Containers/Auth/Register.js'
+import VerifyOtpContainer from 'Client/Containers/Auth/VerifyOtp.js'
+import ForgotPasswordContainer from 'Client/Containers/Auth/ForgotPassword.js'
+import ResetPasswordContainer from 'Client/Containers/Auth/ResetPassword.js'
+
+// Public
+import HomeContainer from 'Client/Containers/Home/index.js'
+import ProductListContainer from 'Client/Containers/Product/List.js'
+import ProductDetailContainer from 'Client/Containers/Product/Detail.js'
+
+// User
+import ProfileContainer from 'Client/Containers/User/Profile.js'
+import OrderCompletion from 'Client/Containers/Order/Checkout/index.js'
+
+// Seller
+import SellerProductsContainer from 'Client/Containers/Seller/Products/index.js'
+import CreateProductContainer from 'Client/Containers/Seller/Product/CreateProduct.js'
+import EditProductDescriptionContainer from 'Client/Containers/Seller/Product/EditProductDescription.js'
+
+// Admin
+import AdminUsersContainer from 'Client/Containers/Admin/Users/index.js'
+import AdminProductsContainer from 'Client/Containers/Admin/Products/index.js'
+
+const App: React.FC = () => {
+	return (
+		<BrowserRouter>
+			<PageProvider>
+				<AuthenticationProvider>
+					<SocketProvider>
+						<Routes>
+							{/* Public Routes (Wrapped in MainLayout) */}
+							<Route element={<MainLayout />}>
+								<Route path="/" element={<HomeContainer />} />
 								<Route
-									path="/auth"
-									element={
-										<PublicRoute
-											redirectIfAuthenticated={true}
-										>
-											<Auth />
-										</PublicRoute>
-									}
+									path="/products"
+									element={<ProductListContainer />}
 								/>
 								<Route
-									path="/verify-otp"
-									element={<VerifyOTP />}
-								/>
-								{/* ✅ NEW: Forgot Password Route */}
-								<Route
-									path="/forgot-password"
-									element={<ForgotPassword />}
+									path="/products/:slug"
+									element={<ProductDetailContainer />}
 								/>
 
-								{/* ✅ BIDDER PROFILE - Default profile route */}
-								<Route
-									path="/profile"
-									element={
-										<ProtectedRoute>
-											<BidderProfile />
-										</ProtectedRoute>
-									}
-								/>
+								{/* Protected User Routes */}
+								<Route element={<ProtectedRoute />}>
+									<Route
+										path="/profile"
+										element={<ProfileContainer />}
+									/>
+									<Route
+										path="/checkout/:id"
+										element={<OrderCompletion />}
+									/>
 
-								{/* ✅ SELLER PROFILE - Only for sellers/admins */}
-								<Route
-									path="/seller/profile"
-									element={
-										<ProtectedRoute
-											allowedRoles={[
-												UserRole.SELLER,
-												UserRole.ADMIN,
-											]}
-										>
-											<SellerProfile />
-										</ProtectedRoute>
-									}
-								/>
-								{/* ✅ NEW: ADMIN PROFILE - Only for admins */}
-								<Route
-									path="/admin/profile"
-									element={
-										<ProtectedRoute
-											allowedRoles={[UserRole.ADMIN]}
-										>
-											<AdminProfile />
-										</ProtectedRoute>
-									}
-								/>
-								<Route
-									path="/watch-list"
-									element={
-										<ProtectedRoute>
-											<WatchList />
-										</ProtectedRoute>
-									}
-								/>
-								<Route
-									path="/order/:id"
-									element={
-										<ProtectedRoute>
-											<OrderCompletion />
-										</ProtectedRoute>
-									}
-								/>
+									{/* Seller Routes */}
+									<Route
+										path="/seller/products"
+										element={<SellerProductsContainer />}
+									/>
+									<Route
+										path="/seller/products/create"
+										element={<CreateProductContainer />}
+									/>
+									<Route
+										path="/seller/products/:id/edit"
+										element={
+											<EditProductDescriptionContainer />
+										}
+									/>
+								</Route>
+							</Route>
 
-								{/* Seller Routes - Require SELLER or ADMIN role */}
-								<Route
-									path="/seller/create-product"
-									element={
-										<ProtectedRoute
-											allowedRoles={[
-												UserRole.SELLER,
-												UserRole.ADMIN,
-											]}
-										>
-											<CreateProduct />
-										</ProtectedRoute>
-									}
-								/>
-								<Route
-									path="/seller/products"
-									element={
-										<ProtectedRoute
-											allowedRoles={[
-												UserRole.SELLER,
-												UserRole.ADMIN,
-											]}
-										>
-											<SellerProducts />
-										</ProtectedRoute>
-									}
-								/>
-								<Route
-									path="/seller/products/:id/edit-description"
-									element={
-										<ProtectedRoute
-											allowedRoles={[
-												UserRole.SELLER,
-												UserRole.ADMIN,
-											]}
-										>
-											<EditProductDescription />
-										</ProtectedRoute>
-									}
-								/>
+							{/* Auth Routes (Standalone) */}
+							<Route
+								path="/auth/login"
+								element={<LoginContainer />}
+							/>
+							<Route
+								path="/auth/register"
+								element={<RegisterContainer />}
+							/>
+							<Route
+								path="/auth/verify-otp"
+								element={<VerifyOtpContainer />}
+							/>
+							<Route
+								path="/auth/forgot-password"
+								element={<ForgotPasswordContainer />}
+							/>
+							<Route
+								path="/auth/reset-password"
+								element={<ResetPasswordContainer />}
+							/>
 
-								{/* Admin Routes - Require ADMIN role */}
+							{/* Admin Routes */}
+							<Route path="/admin" element={<AdminLayout />}>
 								<Route
-									path="/admin/categories"
+									index
 									element={
-										<ProtectedRoute
-											allowedRoles={[UserRole.ADMIN]}
-										>
-											<AdminCategories />
-										</ProtectedRoute>
+										<Navigate to="/admin/users" replace />
 									}
 								/>
 								<Route
-									path="/admin/products"
-									element={
-										<ProtectedRoute
-											allowedRoles={[UserRole.ADMIN]}
-										>
-											<AdminProducts />
-										</ProtectedRoute>
-									}
+									path="users"
+									element={<AdminUsersContainer />}
 								/>
 								<Route
-									path="/admin/users"
-									element={
-										<ProtectedRoute
-											allowedRoles={[UserRole.ADMIN]}
-										>
-											<AdminUsers />
-										</ProtectedRoute>
-									}
+									path="products"
+									element={<AdminProductsContainer />}
 								/>
-								<Route
-									path="/admin/auction-settings"
-									element={
-										<ProtectedRoute
-											allowedRoles={[UserRole.ADMIN]}
-										>
-											<AdminAuctionSettings />
-										</ProtectedRoute>
-									}
-								/>
+							</Route>
 
-								{/* 404 Route */}
-								<Route path="*" element={<NotFound />} />
-							</Routes>
-
-							<Toaster />
-							<Sonner />
-						</WatchlistProvider>
-					</AuthProvider>
-				</BrowserRouter>
-			</RecaptchaProvider>
-		</TooltipProvider>
-	</QueryClientProvider>
-)
+							{/* Fallback */}
+							<Route
+								path="*"
+								element={<Navigate to="/" replace />}
+							/>
+						</Routes>
+					</SocketProvider>
+				</AuthenticationProvider>
+			</PageProvider>
+		</BrowserRouter>
+	)
+}
 
 export default App

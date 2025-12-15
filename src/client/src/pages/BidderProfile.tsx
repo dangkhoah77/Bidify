@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/input/button'
-import { Input } from '@/components/ui/input/input'
-import { Label } from '@/components/ui/input/label'
+import { Button } from 'Client/Components/UI/input/button'
+import { Input } from 'Client/Components/UI/input/input'
+import { Label } from 'Client/Components/UI/input/label'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/data-display/card'
+} from 'Client/Components/UI/data-display/card'
 import {
 	Tabs,
 	TabsContent,
 	TabsList,
 	TabsTrigger,
-} from '@/components/ui/navigation/tabs'
-import { Badge } from '@/components/ui/data-display/badge'
-import { Textarea } from '@/components/ui/input/textarea'
+} from 'Client/Components/UI/navigation/tabs'
+import { Badge } from 'Client/Components/UI/data-display/badge'
+import { Textarea } from 'Client/Components/UI/input/textarea'
 import { ProductCard } from '@/components/ProductCard'
 import {
 	Star,

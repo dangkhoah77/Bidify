@@ -3,19 +3,22 @@ import { useParams, Link } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { CountdownTimer } from '@/components/CountdownTimer'
 import { ProductCard } from '@/components/ProductCard'
-import { Button } from '@/components/ui/input/button'
-import { Badge } from '@/components/ui/data-display/badge'
+import { Button } from 'Client/Components/UI/input/button'
+import { Badge } from 'Client/Components/UI/data-display/badge'
 import {
 	Card,
 	CardContent,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/data-display/card'
-import { Separator } from '@/components/ui/data-display/separator'
-import { Input } from '@/components/ui/input/input'
-import { Textarea } from '@/components/ui/input/textarea'
-import { Avatar, AvatarFallback } from '@/components/ui/data-display/avatar'
-import { Label } from '@/components/ui/input/label'
+} from 'Client/Components/UI/data-display/card'
+import { Separator } from 'Client/Components/UI/data-display/separator'
+import { Input } from 'Client/Components/UI/input/input'
+import { Textarea } from 'Client/Components/UI/input/textarea'
+import {
+	Avatar,
+	AvatarFallback,
+} from 'Client/Components/UI/data-display/avatar'
+import { Label } from 'Client/Components/UI/input/label'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -26,7 +29,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	AlertDialogTrigger,
-} from '@/components/ui/overlay/alert-dialog'
+} from 'Client/Components/UI/overlay/alert-dialog'
 import {
 	Heart,
 	Share2,

@@ -1,30 +1,40 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
+    "compilerOptions": {
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "module": "NodeNext",
+        
+        "esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "ES2022",
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"moduleDetection": "force",
+        "useDefineForClassFields": true,
 
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "react-jsx",
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 
-    /* Linting */
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitAny": false,
-    "noFallthroughCasesInSwitch": false,
+        /* Bundler mode */
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
 
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src"]
+        /* Linting */
+        "strict": true,
+        "noImplicitOverride": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true,
+
+        /* Outputs */
+        "rootDir": "..",
+        "outDir": "dist",
+        "sourceMap": true,
+
+        /* Path aliases */
+        "paths": {
+            "Client/*": ["./src/*"],
+            "Shared/*": ["../shared/src/*"]
+        }
+    },
+    "include": ["./src/**/*", "../shared/src/**/*"],
+    "references": [{ "path": "../shared/tsconfig.client.json" }]
 }

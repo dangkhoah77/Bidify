@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { ProductCard } from '@/components/ProductCard'
-import { Button } from '@/components/ui/input/button'
-import { Input } from '@/components/ui/input/input'
+import { Button } from 'Client/Components/UI/input/button'
+import { Input } from 'Client/Components/UI/input/input'
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/input/select'
+} from 'Client/Components/UI/input/select'
 import { Search as SearchIcon, ChevronLeft, ChevronRight } from 'lucide-react'
 import { mockProducts } from '@/lib/mockData'
 

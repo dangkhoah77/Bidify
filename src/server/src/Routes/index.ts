@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 
 import apiRoutes from './Api/index.js'
-import Keys from '../Config/Keys.js'
+import Keys from 'Config/Keys.js'
 
 /**
  * Main router for the application.

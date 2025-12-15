@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom'
 import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/input/button'
+import { Button } from 'Client/Components/UI/input/button'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/data-display/card'
-import { Badge } from '@/components/ui/data-display/badge'
+} from 'Client/Components/UI/data-display/card'
+import { Badge } from 'Client/Components/UI/data-display/badge'
 import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 import { mockProducts } from '@/lib/mockData'
 

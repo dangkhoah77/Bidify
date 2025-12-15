@@ -1,52 +1,23 @@
-import { Header } from '../components/Header'
-import { ProductCard } from '../components/ProductCard'
-import { Button } from '../components/ui/input/button'
-import { Badge } from '../components/ui/data-display/badge'
+import { Header } from '@/components/Header'
+import { ProductCard } from '@/components/ProductCard'
+import { Button } from 'Client/Components/UI/input/button'
+import { Badge } from 'Client/Components/UI/data-display/badge'
 import { TrendingUp, Clock, DollarSign, Sparkles } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { useHomeProducts } from '../services/utils/products.hooks'
+import { mockProducts } from '@/lib/mockData'
 
 const Index = () => {
-	const { data, isLoading, isError } = useHomeProducts()
+	// Sort products for different sections
+	const endingSoon = [...mockProducts]
+		.sort((a, b) => a.endTime.getTime() - b.endTime.getTime())
+		.slice(0, 5)
 
-	const endingSoon = data?.endingSoon ?? []
-	const mostBids = data?.mostBids ?? []
-	const highestPrice = data?.highestPrice ?? []
+	const mostBids = [...mockProducts]
+		.sort((a, b) => b.bidCount - a.bidCount)
+		.slice(0, 5)
 
-	if (isLoading) {
-		return (
-			<div className="min-h-screen bg-background">
-				<Header />
-				<main className="container py-12">
-					<p>Đang tải sản phẩm...</p>
-				</main>
-			</div>
-		)
-	}
-
-	if (isError) {
-		return (
-			<div className="min-h-screen bg-background">
-				<Header />
-				<main className="container py-12 text-destructive">
-					<p>Có lỗi khi tải danh sách sản phẩm. Vui lòng thử lại.</p>
-				</main>
-			</div>
-		)
-	}
-
-	const mapToCardProps = (p: (typeof endingSoon)[number]) => ({
-		id: p._id,
-		image: p.images?.[0] ?? '/images/placeholder.jpg',
-		title: p.name,
-		currentPrice: p.currentPrice,
-		buyNowPrice: p.buyNowPrice,
-		highestBidder: p.highestBidderName ?? 'Chưa có',
-		bidCount: p.bidCount ?? 0,
-		endTime: new Date(p.endTime),
-		isNew: p.isNew ?? false,
-		category: p.categoryName ?? 'Khác',
-	})
+	const highestPrice = [...mockProducts]
+		.sort((a, b) => b.currentPrice - a.currentPrice)
+		.slice(0, 5)
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -107,15 +78,12 @@ const Index = () => {
 								</p>
 							</div>
 						</div>
-						{/* ✅ CHỈ GIỮ 1 NÚT "XEM TẤT CẢ" */}
-						<Link to="/products/ending-soon">
-							<Button variant="ghost">Xem tất cả →</Button>
-						</Link>
+						<Button variant="ghost">Xem tất cả →</Button>
 					</div>
 
 					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-						{endingSoon.map((p) => (
-							<ProductCard key={p._id} {...mapToCardProps(p)} />
+						{endingSoon.map((product) => (
+							<ProductCard key={product.id} {...product} />
 						))}
 					</div>
 				</section>
@@ -136,15 +104,12 @@ const Index = () => {
 								</p>
 							</div>
 						</div>
-						{/* ✅ CHỈ GIỮ 1 NÚT "XEM TẤT CẢ" */}
-						<Link to="/products/most-bids">
-							<Button variant="ghost">Xem tất cả →</Button>
-						</Link>
+						<Button variant="ghost">Xem tất cả →</Button>
 					</div>
 
 					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-						{mostBids.map((p) => (
-							<ProductCard key={p._id} {...mapToCardProps(p)} />
+						{mostBids.map((product) => (
+							<ProductCard key={product.id} {...product} />
 						))}
 					</div>
 				</section>
@@ -165,15 +130,12 @@ const Index = () => {
 								</p>
 							</div>
 						</div>
-						{/* ✅ CHỈ GIỮ 1 NÚT "XEM TẤT CẢ" */}
-						<Link to="/products/highest-price">
-							<Button variant="ghost">Xem tất cả →</Button>
-						</Link>
+						<Button variant="ghost">Xem tất cả →</Button>
 					</div>
 
 					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-						{highestPrice.map((p) => (
-							<ProductCard key={p._id} {...mapToCardProps(p)} />
+						{highestPrice.map((product) => (
+							<ProductCard key={product.id} {...product} />
 						))}
 					</div>
 				</section>

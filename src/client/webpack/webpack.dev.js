@@ -14,7 +14,7 @@ export default merge(common, {
 			directory: path.join(__dirname, '..', 'public'), // Serves files from /public
 		},
 		historyApiFallback: true, // For React Router
-		port: 8080,
+		port: 3000,
 		open: true, // Opens browser
 		hot: true, // Hot Module Replacement
 	},

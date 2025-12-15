@@ -1,39 +1,58 @@
-import { Schema, model } from 'mongoose'
+import { Schema, Document, model } from 'mongoose'
+
 import {
-	ROLES,
+	ROLE,
 	UPGRADE_REQUEST_STATUS,
 	EMAIL_PROVIDER,
-} from '../Data/Constants/index.js'
+} from 'Shared/Data/Constants/index.js'
+import { ServerUser } from 'Shared/Data/Types/index.js'
+
+/**
+ * Interface representing a User document in MongoDB.
+ *
+ * @interface IUser
+ * @property {string} firstName - The user's first name.
+ * @property {string} lastName - The user's last name.
+ * @property {string} email - The user's email address.
+ * @property {EMAIL_PROVIDER} provider - The email provider used for authentication.
+ * @property {string} [password] - The user's hashed password.
+ * @property {string} [address] - The user's address.
+ * @property {ROLE} role - The user's role in the system.
+ * @property {boolean} isActive - Indicates if the user's account is active.
+ * @property {string} [otp] - One-time password for verification.
+ * @property {Date} [otpExpires] - Expiration date of the OTP.
+ * @property {string} [resetPasswordToken] - Token for password reset.
+ * @property {Date} [resetPasswordExpires] - Expiration date of the reset password token.
+ * @property {UPGRADE_REQUEST_STATUS} upgradeRequestStatus - Status of the user's upgrade request to Seller.
+ */
+export interface IUser extends Omit<ServerUser, 'id'>, Document {}
 
 /**
  * Mongoose schema for the User model.
  */
 const UserSchema = new Schema(
 	{
+		firstName: { type: String, required: true },
+		lastName: { type: String, required: true },
 		email: { type: String, required: true, unique: true, trim: true },
-		password: { type: String },
 		provider: {
 			type: String,
 			required: true,
 			default: EMAIL_PROVIDER.Email,
+			enum: Object.values(EMAIL_PROVIDER),
 		},
-		firstName: { type: String, required: true },
-		lastName: { type: String, required: true },
+		password: { type: String },
 		address: { type: String },
 		role: {
 			type: String,
-			default: ROLES.Bider,
-			enum: Object.values(ROLES),
+			default: ROLE.Bider,
+			enum: Object.values(ROLE),
 		},
 		isActive: { type: Boolean, default: true },
-		isVerified: { type: Boolean, default: false },
 		otp: { type: String },
 		otpExpires: { type: Date },
 		resetPasswordToken: { type: String },
 		resetPasswordExpires: { type: Date },
-		positiveReviews: { type: Number, default: 0 },
-		negativeReviews: { type: Number, default: 0 },
-		watchlist: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
 		upgradeRequestStatus: {
 			type: String,
 			default: UPGRADE_REQUEST_STATUS.None,

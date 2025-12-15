@@ -1,12 +1,12 @@
-import { merge } from 'webpack-merge';
-import common from './webpack.common.js';
+import { merge } from 'webpack-merge'
+import common from './webpack.common.js'
 
 export default merge(common, {
-  mode: 'production',
-  devtool: 'source-map',
-  optimization: {
-    splitChunks: {
-      chunks: 'all', // Bundles vendor code (react, etc.) separately
-    },
-  },
-});
+	mode: 'production',
+	devtool: 'source-map',
+	optimization: {
+		splitChunks: {
+			chunks: 'all', // Bundles vendor code (react, etc.) separately
+		},
+	},
+})

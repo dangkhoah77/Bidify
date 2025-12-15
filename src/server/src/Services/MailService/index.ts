@@ -1,7 +1,8 @@
+import chalk from 'chalk'
 import Mailgun from 'mailgun.js'
 import FormData from 'form-data'
 
-import Keys from '../../Config/Keys.js'
+import Keys from 'Server/Config/Keys.js'
 import GetTemplate from './Template.js'
 
 // Extract api key and domain for mailgun
@@ -16,7 +17,7 @@ const { key, domain, sender } = Keys.mailgun
 const MailService = {
 	mailgun: new Mailgun(FormData).client({
 		username: 'api',
-		key: key || 'API_KEY',
+		key: key,
 	}), // Mailgun client instance for sending emails
 
 	/**
@@ -30,26 +31,19 @@ const MailService = {
 	async sendMail(email: string, type: string, data: any): Promise<any> {
 		try {
 			// Prepare email template
-			const message = GetTemplate(type, data)
-			if (!message) {
+			const config = GetTemplate(type, data)
+			if (!config) {
 				throw new Error('Failed to prepare email template')
 			}
 
-			// Configure email parameters
-			const config = {
-				from: `Online Auction! <no-reply@<${sender}>>`,
-				to: email,
-				subject: message.subject,
-				text: message.text,
-			}
-			console.log('Sending email...')
+			// Add sender and recipient to the email config
+			config.from = `Online Auction! <no-reply@<${sender}>>`
+			config.to = email
+
 			// Send email via Mailgun
-			return await MailService.mailgun.messages.create(
-				domain || 'DOMAIN_NAME',
-				config
-			)
+			return await MailService.mailgun.messages.create(domain, config)
 		} catch (error) {
-			console.error(error)
+			console.log(`${chalk.red('✗ MailService.sendMail error:')} `, error)
 			return error
 		}
 	},

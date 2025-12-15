@@ -1,13 +1,14 @@
 import mongoose from 'mongoose'
 import chalk from 'chalk'
-import keys from '../Config/Keys.js'
 
-const { url } = keys.database
+import Keys from 'Server/Config/Keys.js'
+
+const { url } = Keys.database
 
 /**
  * Sets up and connects to the MongoDB database.
  */
-const setupDB = async (): Promise<void> => {
+const SetupDB = async (): Promise<void> => {
 	try {
 		// Connect to MongoDB using the URL from configuration
 		await mongoose.connect(url as string)
@@ -22,4 +23,4 @@ const setupDB = async (): Promise<void> => {
 	}
 }
 
-export default setupDB
+export default SetupDB

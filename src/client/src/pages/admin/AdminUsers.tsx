@@ -1,12 +1,12 @@
 import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/input/button'
+import { Button } from 'Client/Components/UI/input/button'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/data-display/card'
+} from 'Client/Components/UI/data-display/card'
 import {
 	Table,
 	TableBody,
@@ -14,16 +14,16 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '@/components/ui/data-display/table'
-import { Badge } from '@/components/ui/data-display/badge'
+} from 'Client/Components/UI/data-display/table'
+import { Badge } from 'Client/Components/UI/data-display/badge'
 import {
 	Tabs,
 	TabsContent,
 	TabsList,
 	TabsTrigger,
-} from '@/components/ui/navigation/tabs'
+} from 'Client/Components/UI/navigation/tabs'
 import { Eye, CheckCircle, XCircle } from 'lucide-react'
-import { AdminHeader } from './AdminHeader'
+
 export default function AdminUsers() {
 	const users = [
 		{
@@ -71,7 +71,7 @@ export default function AdminUsers() {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<AdminHeader />
+			<Header />
 
 			<main className="container py-8">
 				<div className="mb-8">

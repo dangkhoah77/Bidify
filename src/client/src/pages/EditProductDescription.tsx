@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/input/button'
+import { Button } from 'Client/Components/UI/input/button'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/data-display/card'
-import { Textarea } from '@/components/ui/input/textarea'
-import { Label } from '@/components/ui/input/label'
+} from 'Client/Components/UI/data-display/card'
+import { Textarea } from 'Client/Components/UI/input/textarea'
+import { Label } from 'Client/Components/UI/input/label'
 import { ArrowLeft } from 'lucide-react'
 import { mockProducts } from '@/lib/mockData'
 import { useToast } from '@/hooks/use-toast'

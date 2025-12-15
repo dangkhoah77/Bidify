@@ -3,10 +3,11 @@
 	"version": "1.0.0",
 	"description": "Bidify Server",
 	"type": "module",
-	"main": "index.ts",
+	"main": "src/index.ts",
 	"scripts": {
 		"dev": "nodemon",
-		"start": "npx tsc && cross-env NODE_ENV=production node dist/index.js",
+		"build": "tsc -b && tsc-alias",
+		"start": "npm run build && cross-env NODE_ENV=production node dist/server/src/index.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"dependencies": {
@@ -15,24 +16,27 @@
 		"cors": "^2.8.5",
 		"dotenv": "^17.2.3",
 		"express": "^5.1.0",
-		"express-rate-limit": "^8.2.1",
+		"express-validator": "^7.3.1",
 		"form-data": "^4.0.4",
 		"helmet": "^8.1.0",
 		"jsonwebtoken": "^9.0.2",
 		"mailgun.js": "^12.1.1",
 		"mongoose": "^8.19.3",
 		"mongoose-slug-generator": "^1.0.4",
+		"multer": "^2.0.2",
 		"passport": "^0.7.0",
 		"passport-google-oauth2": "^0.2.0",
 		"passport-jwt": "^4.0.1"
 	},
 	"devDependencies": {
 		"@types/cors": "^2.8.19",
+		"@types/multer": "^2.0.0",
 		"@types/node": "^24.10.0",
 		"@types/passport": "^1.0.17",
 		"@types/passport-jwt": "^4.0.1",
 		"chalk": "^5.6.2",
 		"cross-env": "^10.1.0",
-		"nodemon": "^3.1.10"
+		"nodemon": "^3.1.10",
+		"tsc-alias": "^1.8.16"
 	}
 }

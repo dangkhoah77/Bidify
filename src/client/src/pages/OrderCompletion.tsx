@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/input/button'
-import { Input } from '@/components/ui/input/input'
-import { Label } from '@/components/ui/input/label'
+import { Button } from 'Client/Components/UI/input/button'
+import { Input } from 'Client/Components/UI/input/input'
+import { Label } from 'Client/Components/UI/input/label'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/data-display/card'
-import { Textarea } from '@/components/ui/input/textarea'
-import { Badge } from '@/components/ui/data-display/badge'
+} from 'Client/Components/UI/data-display/card'
+import { Textarea } from 'Client/Components/UI/input/textarea'
+import { Badge } from 'Client/Components/UI/data-display/badge'
 import {
 	CheckCircle,
 	Package,

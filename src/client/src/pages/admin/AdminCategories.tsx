@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/input/button'
-import { Input } from '@/components/ui/input/input'
+import { Button } from 'Client/Components/UI/input/button'
+import { Input } from 'Client/Components/UI/input/input'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/data-display/card'
+} from 'Client/Components/UI/data-display/card'
 import {
 	Table,
 	TableBody,
@@ -16,7 +16,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '@/components/ui/data-display/table'
+} from 'Client/Components/UI/data-display/table'
 import {
 	Dialog,
 	DialogContent,
@@ -25,10 +25,10 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '@/components/ui/overlay/dialog'
-import { Label } from '@/components/ui/input/label'
+} from 'Client/Components/UI/overlay/dialog'
+import { Label } from 'Client/Components/UI/input/label'
 import { Plus, Edit, Trash2 } from 'lucide-react'
-import { AdminHeader } from './AdminHeader'
+
 export default function AdminCategories() {
 	const [categories, setCategories] = useState([
 		{ id: 1, name: 'Điện tử', parent: null, productCount: 45 },
@@ -51,7 +51,7 @@ export default function AdminCategories() {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<AdminHeader />
+			<Header />
 
 			<main className="container py-8">
 				<div className="flex items-center justify-between mb-8">

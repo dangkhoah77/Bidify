@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/input/button'
-import { Input } from '@/components/ui/input/input'
-import { Label } from '@/components/ui/input/label'
+import { Button } from 'Client/Components/UI/input/button'
+import { Input } from 'Client/Components/UI/input/input'
+import { Label } from 'Client/Components/UI/input/label'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/data-display/card'
-import { Textarea } from '@/components/ui/input/textarea'
+} from 'Client/Components/UI/data-display/card'
+import { Textarea } from 'Client/Components/UI/input/textarea'
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/input/select'
-import { Switch } from '@/components/ui/input/switch'
+} from 'Client/Components/UI/input/select'
+import { Switch } from 'Client/Components/UI/input/switch'
 import { Upload, X } from 'lucide-react'
 
 export default function CreateProduct() {

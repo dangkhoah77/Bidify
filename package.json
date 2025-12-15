@@ -4,9 +4,12 @@
 	"description": "An online auction platform",
 	"type": "module",
 	"scripts": {
-		"install:client": "cd src/client && npm install",
-		"install:server": "cd src/server && npm install",
+		"install:client": "cd src/client && npm install && npm audit fix",
+		"install:server": "cd src/server && npm install && npm audit fix",
 		"install:all": "npm-run-all --parallel install:client install:server",
+		"build:server": "cd src/server && npm run build",
+		"build:client": "cd src/client && npm run build",
+		"build": "npm-run-all --parallel build:server build:client",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
