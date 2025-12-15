@@ -95,4 +95,5 @@ export type ServerUser = User & {
 	resetPasswordToken?: string | null
 	resetPasswordExpires?: Date | null
 	upgradeRequestStatus: UPGRADE_REQUEST_STATUS
+    watchlist: string[]
 }

@@ -35,7 +35,8 @@ export type CategoryType = {
  */
 export type ProductType = {
 	name: string
-	slug: string
+	// slug: string
+    _id: string
 	description: string
 	category: CategoryType
 	seller: User
@@ -61,6 +62,7 @@ export type ProductType = {
  * @property {User} bidder - The user who placed the bid.
  * @property {number} price - The amount of the bid.
  * @property {number} maxPrice - The maximum auto-bid amount set by the bidder, if any.
+ * @property {Date} joinedAt - The date the user registered bidding for the product.
  * @property {Date} createdAt - The date and time when the bid was placed.
  * @property {boolean} latest - Indicates if this bid is the latest bid placed.
  */
@@ -70,6 +72,7 @@ export type BidType = {
 	bidder: User
 	price: number
 	maxPrice: number
+	joinedAt: Date
 	createdAt: Date
 	latest: boolean
 }

@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"lib": ["es2022"],
+		"lib": ["dom", "es2022"],
 		"module": "NodeNext",
 
 		/* Base Options */
