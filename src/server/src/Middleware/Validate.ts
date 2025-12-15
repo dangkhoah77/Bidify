@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { ValidationChain, validationResult } from 'express-validator'
 
-import { ApiResponse } from 'Shared/Data/Types/index.js'
+import { ApiResponseData } from 'Shared/Data/Types/index.js'
 
 /**
  * Middleware to validate request data based on provided validation chains.
@@ -20,7 +20,7 @@ export default (validations: ValidationChain[]) => {
 			// If there are validation errors, respond and skip to the next middleware
 			if (!errors.isEmpty()) {
 				const firstError = errors.array()[0]
-				const response: ApiResponse = {
+				const response: ApiResponseData = {
 					error: firstError
 						? firstError.msg
 						: 'Unknown validation error',

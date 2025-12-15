@@ -20,10 +20,10 @@ export default {
 		domain: process.env.MAILGUN_DOMAIN as string, // Mailgun domain
 		sender: process.env.MAILGUN_SENDER as string, // Mailgun sender email
 	},
-	// aws: {
-	// 	accessKeyId: process.env.AWS_ACCESS_KEY_ID as string, // AWS access key ID
-	// 	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string, // AWS secret access key
-	// 	region: process.env.AWS_REGION as string, // AWS region
-	// 	bucketName: process.env.AWS_BUCKET_NAME as string, // AWS S3 bucket name
-	// },
+	aws: {
+		accessKeyId: process.env.AWS_ACCESS_KEY_ID as string, // AWS access key ID
+		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string, // AWS secret access key
+		region: process.env.AWS_REGION as string, // AWS region
+		bucketName: process.env.AWS_BUCKET_NAME as string, // AWS S3 bucket name
+	},
 }

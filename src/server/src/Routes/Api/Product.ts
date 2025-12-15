@@ -1,86 +1,195 @@
-// import express, { Request, Response } from 'express'
-// import { Document } from 'mongoose'
-// import multer from 'multer'
+import express, { Request, Response } from 'express'
+import multer from 'multer'
+import { SortOrder } from 'mongoose'
 
-// import Product from 'Models/Product.js'
-// import Auth from 'Middleware/Auth.js'
-// import Role from 'Middleware/Role.js'
-// import S3Upload from 'Utility/Storage.js'
+import Product from 'Server/Models/Product.js'
+import Category from 'Server/Models/Category.js'
+import Auth from 'Server/Middleware/Auth.js'
+import Role from 'Server/Middleware/Role.js'
+import S3Upload from 'Server/Utility/Storage.js'
+import { ROLE } from 'Shared/Data/Constants/index.js'
+import { ProductsQueryParams } from 'Shared/Data/Types/index.js'
 
-// /** Router for product-related API routes */
-// const router = express.Router()
+const router = express.Router()
 
-// // Configure multer for file uploads
-// const storage = multer.memoryStorage()
-// const upload = multer({ storage })
+const storage = multer.memoryStorage()
+const upload = multer({ storage })
 
-// /**
-//  * Fetch product slug api
-//  * Returns product details based on the provided slug.
-//  *
-//  * @route GET /item/:slug
-//  */
-// router.get('/item/:slug', async (req: Request, res: Response) => {
-// 	try {
-// 		const slug = req.params.slug
+/**
+ * GET /api/products
+ */
+router.get('/', async (req: Request, res: Response) => {
+	try {
+		const {
+			page = 1,
+			limit = 12,
+			category,
+			search,
+			sort,
+		} = req.query as unknown as ProductsQueryParams
 
-// 		// Find the product by slug and ensure it is active
-// 		const productDoc = await Product.findOne({
-// 			slug: slug,
-// 			isActive: true,
-// 		}).populate({
-// 			path: 'seller',
-// 			select: 'isActive',
-// 		})
+		const query: any = { isActive: true }
 
-// 		// Check if the seller is active
-// 		const seller = productDoc?.seller as any
-// 		const hasNoSeller = seller === null || seller.isActive === false
+		if (search) {
+			const regex = new RegExp(search, 'i')
+			query.$or = [{ name: regex }, { description: regex }]
+		}
 
-// 		// If no product found or seller is inactive, return 404
-// 		if (!productDoc || hasNoSeller) {
-// 			return res.status(404).json({
-// 				message: 'No product found.',
-// 			})
-// 		}
+		if (category) {
+			const categoryDoc = await Category.findOne({
+				$or: [
+					{ name: category },
+					{
+						_id: category.match(/^[0-9a-fA-F]{24}$/)
+							? category
+							: null,
+					},
+				],
+			})
+			if (categoryDoc) {
+				query.category = categoryDoc._id
+			}
+		}
 
-// 		// Return the product details
-// 		res.status(200).json({
-// 			product: productDoc,
-// 		})
-// 	} catch (error: any) {
-// 		res.status(400).json({
-// 			error:
-// 				error.message ||
-// 				'Your request could not be processed. Please try again.',
-// 		})
-// 	}
-// })
+		let sortOptions: { [key: string]: SortOrder } = { createdAt: -1 }
+		if (sort === 'price_asc') sortOptions = { currentPrice: 1 }
+		else if (sort === 'price_desc') sortOptions = { currentPrice: -1 }
+		else if (sort === 'time_asc') sortOptions = { endTime: 1 }
+		else if (sort === 'time_desc') sortOptions = { endTime: -1 }
 
-// router.get('/list/search/:name', async (req: Request, res: Response) => {
-// 	try {
-// 		const name = req.params.name
+		const skip = (Number(page) - 1) * Number(limit)
 
-// 		const productDoc = await Product.find(
-// 			{
-// 				name: { $regex: new RegExp(name), $options: 'is' },
-// 				isActive: true,
-// 			},
-// 			{ name: 1, slug: 1, imageUrl: 1, price: 1, _id: 0 }
-// 		)
+		const products = await Product.find(query)
+			.populate('category', 'name')
+			.populate('seller', 'firstName lastName')
+			.sort(sortOptions)
+			.skip(skip)
+			.limit(Number(limit))
+			.exec()
 
-// 		if (productDoc.length < 0) {
-// 			return res.status(404).json({
-// 				message: 'No product found.',
-// 			})
-// 		}
+		if (!products) {
+			throw new Error('Error fetching products from database.')
+		}
 
-// 		res.status(200).json({
-// 			products: productDoc,
-// 		})
-// 	} catch (error) {
-// 		res.status(400).json({
-// 			error: 'Your request could not be processed. Please try again.',
-// 		})
-// 	}
-// })
+		return res.status(200).json({
+			success: true,
+			data: {
+				products,
+				total: products.length,
+				page: Number(page),
+				totalPages: Math.ceil(products.length / Number(limit)),
+			},
+		})
+	} catch (error: any) {
+		return res.status(500).json({
+			success: false,
+			error: error.message || 'Failed to fetch products',
+		})
+	}
+})
+
+/**
+ * GET /api/products/:id  <-- ✅ CHANGED from :slug
+ * Fetch single product details by ID.
+ */
+router.get('/:id', async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params // ✅ CHANGED
+
+		// ✅ CHANGED: Query by _id instead of slug
+		const product = await Product.findOne({ _id: id, isActive: true })
+			.populate('category')
+			.populate('seller', 'firstName lastName email')
+			.populate('highestBidder', 'firstName lastName')
+
+		if (!product) {
+			return res
+				.status(404)
+				.json({ success: false, error: 'Product not found' })
+		}
+
+		return res.status(200).json({
+			success: true,
+			data: { product },
+		})
+	} catch (error: any) {
+		return res.status(500).json({
+			success: false,
+			error: error.message || 'Failed to fetch product',
+		})
+	}
+})
+
+/**
+ * POST /api/products
+ * Create a new product (Seller only).
+ */
+router.post(
+	'/',
+	Auth,
+	Role.check(ROLE.Seller, ROLE.Admin),
+	upload.array('images', 5),
+	async (req: Request, res: Response) => {
+		try {
+			const {
+				name,
+				category,
+				startPrice,
+				priceStep,
+				buyNowPrice,
+				description,
+				endTime,
+				autoExtend,
+			} = req.body
+
+			const files = req.files as Express.Multer.File[]
+			const user = req.user as any
+
+			if (!files || files.length === 0) {
+				return res.status(400).json({
+					success: false,
+					error: 'At least one image is required',
+				})
+			}
+
+			const uploadedImages = await Promise.all(
+				files.map((file) => S3Upload(file))
+			)
+			const imageUrls = uploadedImages.map((img) => img.imageUrl)
+
+			// ❌ REMOVED: Slug generation logic
+
+			const newProduct = new Product({
+				name,
+				// slug, // ❌ REMOVED
+				description,
+				category,
+				seller: user._id,
+				imageUrl: imageUrls,
+				imageKey: uploadedImages.map((img) => img.imageKey),
+				startPrice: Number(startPrice),
+				currentPrice: Number(startPrice),
+				priceStep: Number(priceStep),
+				buyNowPrice: buyNowPrice ? Number(buyNowPrice) : undefined,
+				startTime: new Date(),
+				endTime: new Date(endTime),
+				autoExtend: autoExtend === 'true',
+				isActive: true,
+			})
+
+			await newProduct.save()
+
+			return res.status(201).json({
+				success: true,
+				data: { product: newProduct },
+			})
+		} catch (error: any) {
+			return res.status(500).json({
+				success: false,
+				error: error.message || 'Failed to create product',
+			})
+		}
+	}
+)
+
+export default router

@@ -1,12 +1,8 @@
+// server/src/Routes/index.ts
 import express, { Request, Response } from 'express'
-
 import apiRoutes from './Api/index.js'
-import Keys from 'Config/Keys.js'
+import Keys from 'Server/Config/Keys.js'
 
-/**
- * Main router for the application.
- * Mounts all API routes under the /api prefix.
- */
 const router = express.Router()
 
 // Extract the base API URL from configuration

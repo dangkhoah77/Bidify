@@ -58,6 +58,11 @@ const UserSchema = new Schema(
 			default: UPGRADE_REQUEST_STATUS.None,
 			enum: Object.values(UPGRADE_REQUEST_STATUS),
 		},
+        watchlist: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
+        default: []
+    }]
 	},
 	{ timestamps: true }
 )

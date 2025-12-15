@@ -27,7 +27,7 @@ import { ICategory } from './Category.js'
 export interface IProduct
 	extends Omit<
 			ProductType,
-			'category' | 'seller' | 'highestBidder' | 'winner'
+            '_id' | 'category' | 'seller' | 'highestBidder' | 'winner'
 		>,
 		Document {
 	category: ICategory | mongoose.Types.ObjectId
@@ -42,7 +42,7 @@ export interface IProduct
 const ProductSchema = new Schema(
 	{
 		name: { type: String, trim: true, required: true },
-		slug: { type: String, trim: true, required: true, unique: true },
+		// slug: { type: String, trim: true, required: true, unique: true },
 		description: { type: String, required: true },
 		category: {
 			type: Schema.Types.ObjectId,
