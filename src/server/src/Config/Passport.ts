@@ -1,12 +1,10 @@
 import { Express } from 'express'
 import passport from 'passport'
-import mongoose from 'mongoose'
 import JwtPassport from 'passport-jwt'
 
 import Keys from './Keys.js'
 
-const User = mongoose.model('User')
-const Secret = Keys.jwt.secret
+import User from 'Server/Models/User/index.js'
 
 /**
  * JWT strategy options for Passport.
@@ -16,7 +14,7 @@ const Secret = Keys.jwt.secret
  */
 const options: JwtPassport.StrategyOptions = {
 	jwtFromRequest: JwtPassport.ExtractJwt.fromAuthHeaderAsBearerToken(),
-	secretOrKey: Secret,
+	secretOrKey: Keys.jwt.secret,
 }
 
 /**
@@ -31,8 +29,8 @@ function verify(
 ) {
 	// Find the user by ID from the JWT payload
 	User.findById(payload.id)
-		.then((user: typeof User | null) => {
-			if (user) {
+		.then((user: (typeof User & any) | null) => {
+			if (user && user.isVerified) {
 				return done(null, user)
 			}
 			return done(null, null)

@@ -21,9 +21,10 @@ export default (validations: ValidationChain[]) => {
 			if (!errors.isEmpty()) {
 				const firstError = errors.array()[0]
 				const response: ApiResponseData = {
-					error: firstError
+					success: false,
+					message: firstError
 						? firstError.msg
-						: 'Unknown validation error',
+						: 'Lỗi xác thực không xác định.',
 				}
 				return res.status(400).json(response)
 			}

@@ -2,30 +2,52 @@
  * Login Request Payload
  *
  * @type LoginRequestData
- * @property {string} credential - The user's username or email
+ * @property {string} email - The user's username
  * @property {string} password - The user's password
  */
 export type LoginRequestData = {
-	credential: string
+	email: string
 	password: string
 }
 
 /**
- * Signup Request Payload
+ * Register Request Payload
  *
- * @type SignupRequestData
+ * @type RegisterRequestData
  * @property {string} firstName - The user's first name
  * @property {string} lastName - The user's last name
- * @property {string} [email] - The user's email address
- * @property {string} [phoneNumber] - The user's phone number
+ * @property {string} email - The user's email address
  * @property {string} password - The user's password
+ * @property {string} captchaToken - The ReCaptcha token for verification
  */
-export type SignupRequestData = {
+export type RegisterRequestData = {
 	firstName: string
 	lastName: string
-	email?: string
-	phoneNumber?: string
+	email: string
 	password: string
+	captchaToken: string
+}
+
+/**
+ * Resend OTP Request Payload
+ *
+ * @type ResendOtpRequestData
+ * @property {string} email - The email address to resend OTP to
+ */
+export type ResendOtpRequestData = {
+	email: string
+}
+
+/**
+ * OTP Verification Request Payload
+ *
+ * @type OtpVerificationRequestData
+ * @property {string} email - The email address to verify
+ * @property {string} otp - The One-Time Password sent to the user
+ */
+export type OtpVerificationRequestData = {
+	email: string
+	otp: string
 }
 
 /**
@@ -39,25 +61,23 @@ export type ForgotPasswordRequestData = {
 }
 
 /**
- * Reset Password Request Payload
+ * Reset Password with Token Request Payload
  *
- * @type ResetPasswordRequestData
- * @property {string} token - The password reset token
- * @property {string} newPassword - The new password
+ * @type ResetPasswordWithTokenRequestData
+ * @property {string} newPassword - The new password to set
  */
-export type ResetPasswordRequestData = {
-	token: string
+export type ResetPasswordWithTokenRequestData = {
 	newPassword: string
 }
 
 /**
- * OTP Verification Request Payload
+ * Reset Password Request Payload
  *
- * @type OtpVerificationRequestData
- * @property {string} email - The email address to verify
- * @property {string} otp - The One-Time Password sent to the user
+ * @type ResetPasswordRequestData
+ * @property {string} currentPassword - The user's current password
+ * @property {string} newPassword - The user's new password
  */
-export type OtpVerificationRequestData = {
-	email: string
-	otp: string
+export type ResetPasswordRequestData = {
+	currentPassword: string
+	newPassword: string
 }

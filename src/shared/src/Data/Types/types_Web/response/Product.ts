@@ -1,24 +1,27 @@
 import type {
-	ProductType,
-	CategoryType,
-	BidType,
+	Product,
+	Category,
+	Bid,
 	ApiResponseData,
 } from 'Shared/Data/Types/index.js'
 
 /**
- * Data payload for Product List response
+ * Data payload for Product Listing response
  *
- * @interface ProductListResponseData
+ * @interface ProductListingResponseData
  * @property {boolean} success - Indicates if the authentication was successful
- * @property {string} [error] - Optional error message if the authentication failed
- * @property {{ products: ProductType[]; total: number; page: number; totalPages: number }} [data] - Contains the list of products and pagination info
+ * @property {string} message - A message providing additional information about the product list response
+ * @property {{ products: Product[]; pagination: { page: number; limit: number; total: number; totalPages: number } }} [data] - Contains the list of products and pagination info
  */
-export interface ProductListResponseData extends ApiResponseData {
+export interface ProductListingResponseData extends ApiResponseData {
 	data?: {
-		products: ProductType[]
-		total: number
-		page: number
-		totalPages: number
+		products: Product[]
+		pagination: {
+			page: number
+			limit: number
+			total: number
+			totalPages: number
+		}
 	}
 }
 
@@ -27,33 +30,9 @@ export interface ProductListResponseData extends ApiResponseData {
  *
  * @interface ProductDetailResponseData
  * @property {boolean} success - Indicates if the authentication was successful
- * @property {string} [error] - Optional error message if the authentication failed
- * @property {{ product: ProductType }} [data] - Contains the product details
+ * @property {string} message - A message providing additional information about the product detail response
+ * @property {{ product: Product; relatedProducts?: Product[] }} [data] - Contains the product detail and optional related products
  */
 export interface ProductDetailResponseData extends ApiResponseData {
-	data?: { product: ProductType }
-}
-
-/**
- * Data payload for Category List response.
- *
- * @interface CategoryListResponseData
- * @property {boolean} success - Indicates if the authentication was successful
- * @property {string} [error] - Optional error message if the authentication failed
- * @property {{ categories: CategoryType[] }} [data] - Contains the list of categories
- */
-export interface CategoryListResponseData extends ApiResponseData {
-	data?: { categories: CategoryType[] }
-}
-
-/**
- * Data payload for Bid History response.
- *
- * @interface BidHistoryResponseData
- * @property {boolean} success - Indicates if the authentication was successful
- * @property {string} [error] - Optional error message if the authentication failed
- * @property {{ bids: BidType[] }} [data] - Contains the list of bids
- */
-export interface BidHistoryResponseData extends ApiResponseData {
-	data?: { bids: BidType[] }
+	data?: { product: Product; relatedProducts?: Product[] }
 }

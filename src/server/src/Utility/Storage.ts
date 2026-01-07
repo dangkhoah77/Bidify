@@ -1,6 +1,18 @@
-import AWS from 'aws-sdk'
+import { S3Client } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
 
 import Keys from 'Server/Config/Keys.js'
+
+/**
+ * AWS S3 v3 client
+ */
+const s3 = new S3Client({
+	region: Keys.aws.region,
+	credentials: {
+		accessKeyId: Keys.aws.accessKeyId,
+		secretAccessKey: Keys.aws.secretAccessKey,
+	},
+})
 
 /**
  * Uploads an image to AWS S3 and returns the image URL and key.
@@ -8,54 +20,31 @@ import Keys from 'Server/Config/Keys.js'
  * @param image - The image file to be uploaded.
  * @returns An object containing the image URL and key.
  */
-const Upload = async function (image: Express.Multer.File): Promise<{
+const UploadImage = async function (image: Express.Multer.File): Promise<{
 	imageUrl: string
 	imageKey: string
 }> {
 	try {
-		let imageUrl = ''
-		let imageKey = ''
+		const key = image.originalname
 
-		if (image) {
-			// Check for all required AWS configuration values before proceeding
-			if (
-				!Keys.aws.accessKeyId ||
-				!Keys.aws.secretAccessKey ||
-				!Keys.aws.region ||
-				!Keys.aws.bucketName
-			) {
-				console.error(
-					'AWS configuration is incomplete. Cannot upload file.'
-				)
-				return { imageUrl: '', imageKey: '' }
-			}
-
-			const s3bucket = new AWS.S3({
-				accessKeyId: Keys.aws.accessKeyId,
-				secretAccessKey: Keys.aws.secretAccessKey,
-				region: Keys.aws.region,
-			})
-
-			const params = {
+		const uploader = new Upload({
+			client: s3,
+			params: {
 				Bucket: Keys.aws.bucketName,
-				Key: image.originalname,
+				Key: key,
 				Body: image.buffer,
 				ContentType: image.mimetype,
-			}
+			},
+		})
 
-			// Upload the image to AWS
-			const s3Upload = await s3bucket.upload(params).promise()
+		const result = await uploader.done()
+		const imageUrl = result.Location!
 
-			// Get the url and key for the uploaded image
-			imageUrl = s3Upload.Location
-			imageKey = s3Upload.Key
-		}
-
-		return { imageUrl, imageKey }
+		return { imageUrl, imageKey: key }
 	} catch (error) {
-		console.error('Error uploading to S3:', error)
+		console.error('Error uploading to S3 (v3):', error)
 		return { imageUrl: '', imageKey: '' }
 	}
 }
 
-export default Upload
+export default UploadImage

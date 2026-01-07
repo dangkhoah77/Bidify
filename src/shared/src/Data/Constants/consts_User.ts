@@ -3,13 +3,13 @@
  *
  * @enum {string} ROLE
  * @property {string} Admin - Administrator with full access
- * @property {string} Bider - User who can bid on items
+ * @property {string} Bidder - User who can bid on items
  * @property {string} Seller - User who can list items for sale
  * @property {string} Guest - Non-logged-in user
  */
 export enum ROLE {
 	Admin = 'ROLE ADMIN',
-	Bider = 'ROLE BIDER',
+	Bidder = 'ROLE BIDDER',
 	Seller = 'ROLE SELLER',
 	Guest = 'ROLE GUEST',
 }
@@ -28,18 +28,6 @@ export enum UPGRADE_REQUEST_STATUS {
 	Pending = 'PENDING',
 	Approved = 'APPROVED',
 	Rejected = 'REJECTED',
-}
-
-/**
- * Defines the email providers supported for user authentication.
- *
- * @enum {string} EMAIL_PROVIDER
- * @property {string} Email - Standard email provider
- * @property {string} Google - Google authentication provider
- */
-export enum EMAIL_PROVIDER {
-	Email = 'Email',
-	Google = 'Google',
 }
 
 /**

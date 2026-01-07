@@ -32,7 +32,7 @@ app.use(
 app.use(cors())
 
 // Connect to the MongoDB database
-SetupDB()
+await SetupDB()
 
 // Initialize Passport for authentication
 InitializePassport(app)
@@ -45,7 +45,7 @@ const port = Keys.port
 http.createServer(app).listen(port, () => {
 	console.log(
 		`${chalk.green('✓')} ${chalk.blue(
-			`Server is running on port ${port}! Visit https://${Keys.host}:${port}/ in your browser.`
+			`Server is running on port ${port}! Visit http://${Keys.host}:${port}/ in your browser.`
 		)}`
 	)
 })

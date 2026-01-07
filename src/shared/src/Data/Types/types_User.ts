@@ -1,6 +1,7 @@
+import { Product } from './types_Product.js'
 import {
 	ROLE,
-	EMAIL_PROVIDER,
+	RATING,
 	UPGRADE_REQUEST_STATUS,
 } from 'Shared/Data/Constants/index.js'
 
@@ -24,76 +25,80 @@ export type Name = {
  * @property {string} [to] - The recipient's email address
  * @property {string} subject - The subject of the email
  * @property {string} text - The body text of the email
+ * @property {string} html - The HTML content of the email
  */
 export type Mail = {
 	from?: string
 	to?: string
 	subject: string
 	text: string
+	html: string
 }
 
 /**
- * Represents a user's address.
+ * Review type representing a review given by a user to another user for a product.
  *
- * @type Address
- * @property {string} street - The street address
- * @property {string} city - The city
- * @property {string} state - The state or province
- * @property {string} zipCode - The postal code
- * @property {string} country - The country
+ * @type Review
+ * @property {string} id - The unique identifier of the review.
+ * @property {ProductType} product - The product being reviewed.
+ * @property {User} reviewer - The user who wrote the review.
+ * @property {User} reviewedUser - The user who is being reviewed.
+ * @property {string} text - The text provided in the review.
+ * @property {RATING} rating - The rating given in the review.
+ * @property {Date} createdAt - The date and time when the review was created.
+ * @property {Date} updatedAt - The date and time when the review was last updated.
  */
-export type Address = {
-	street: string
-	city: string
-	state: string
-	zipCode: string
-	country: string
+export type Review = {
+	id: string
+	product: Product
+	reviewer: User
+	reviewedUser: User
+	text: string
+	rating: RATING
+	createdAt: Date
+	updatedAt: Date
 }
 
 /**
- * User Type Definition
+ * User Type representing a user in the system.
  *
  * @type User
  * @property {string} id - The unique identifier of the user.
  * @property {string} firstName - The user's first name.
  * @property {string} lastName - The user's last name.
  * @property {ROLE} role - The user's role in the system.
+ * @property {Review[]} reviewsReceived - List of reviews the user has received.
  */
 export type User = {
 	id: string
 	firstName: string
 	lastName: string
 	role: ROLE
+	reviewsReceived: Review[]
 }
 
 /**
- * Server-side User Type Definition
+ * User profile type representing detailed information about a user.
+ * Received upon profile retrieval or authentication.
  *
- * @type ServerUser
+ * @type UserProfile
+ * @property {string} id - The unique identifier of the user.
  * @property {string} firstName - The user's first name.
  * @property {string} lastName - The user's last name.
  * @property {string} email - The user's email address.
- * @property {EMAIL_PROVIDER} provider - The email provider used for authentication.
- * @property {string} [password] - The user's hashed password.
- * @property {string} [address] - The user's address.
  * @property {ROLE} role - The user's role in the system.
- * @property {boolean} isActive - Indicates if the user's account is active.
- * @property {string} [otp] - One-time password for verification.
- * @property {Date} [otpExpires] - Expiration date of the OTP.
- * @property {string} [resetPasswordToken] - Token for password reset.
- * @property {Date} [resetPasswordExpires] - Expiration date of the reset password token.
+ * @property {number} balance - The user's account balance.
+ * @property {ProductType[]} watchlist - List of product IDs in the user's watchlist.
+ * @property {ReviewType[]} reviewsWritten - List of reviews the user has written.
+ * @property {ReviewType[]} reviewsReceived - List of reviews the user has received.
  * @property {UPGRADE_REQUEST_STATUS} upgradeRequestStatus - Status of the user's upgrade request to Seller.
+ * @property {Date} [sellerRoleExpires] - Expiration date of the seller status, if applicable.
  */
-export type ServerUser = User & {
+export type UserProfile = User & {
 	email: string
-	password?: string | null
-	provider: EMAIL_PROVIDER
-	address?: string | null
-	isActive: boolean
-	otp?: string | null
-	otpExpires?: Date | null
-	resetPasswordToken?: string | null
-	resetPasswordExpires?: Date | null
+	balance: number
+	watchlist: Product[]
+	reviewsWritten: Review[]
 	upgradeRequestStatus: UPGRADE_REQUEST_STATUS
-    watchlist: string[]
+	sellerRoleExpires?: Date
 }

@@ -11,14 +11,19 @@ export default {
 	database: {
 		url: process.env.MONGO_URL as string, // MongoDB connection URL
 	},
+	captcha: {
+		secret: process.env.CAPTCHA_KEY as string, // reCaptcha secret key
+	},
+	optLife: process.env.OTP_LIFE as StringValue, // OTP expiry time
+	resetTokenLife: process.env.RESET_TOKEN_LIFE as StringValue, // Reset token expiry time
+	sellerRoleLife: process.env.SELLER_ROLE_LIFE as StringValue, // Seller role expiry time
 	jwt: {
 		secret: process.env.JWT_SECRET as string, // JWT secret key
 		tokenLife: process.env.JWT_LIFE as StringValue, // JWT token life
 	},
-	mailgun: {
-		key: process.env.MAILGUN_API_KEY as string, // Mailgun API key
-		domain: process.env.MAILGUN_DOMAIN as string, // Mailgun domain
-		sender: process.env.MAILGUN_SENDER as string, // Mailgun sender email
+	email: {
+		user: process.env.EMAIL_USER as string, // Email user for SMTP
+		pass: process.env.EMAIL_PASS as string, // Email password for SMTP
 	},
 	aws: {
 		accessKeyId: process.env.AWS_ACCESS_KEY_ID as string, // AWS access key ID

@@ -2,28 +2,18 @@
  * Get Products Query Parameters
  *
  * @type ProductsQueryParams
- * @property {number} [page] - The page number for pagination
- * @property {number} [limit] - Number of items per page
- * @property {string} [category] - Filter by category name or ID
- * @property {string} [search] - Search keyword for product title/description
- * @property {string} [sort] - Sort order (e.g., 'price_asc', 'time_desc')
+ * @property {number} page - The page number for pagination
+ * @property {number} limit - Number of items per page
+ * @property {string} [keyword] - Search keyword for product name/description
+ * @property {string} [categoryId] - Filter by category ID
+ * @property {string} [sort] - Sort order (e.g., 'time_desc', 'price_asc', 'price_desc', 'bids_desc')
  */
 export type ProductsQueryParams = {
-	page?: number
-	limit?: number
-	category?: string
-	search?: string
-	sort?: string
-}
-
-/**
- * Get Products Request Payload
- *
- * @type GetProductsRequestData
- * @property {ProductsQueryParams} params - The query parameters for fetching products
- */
-export type GetProductsRequestData = {
-	params: ProductsQueryParams
+	page: number
+	limit: number
+	keyword?: string
+	categoryId?: string
+	sortBy?: 'time_desc' | 'time_acs' | 'price_asc' | 'price_desc' | 'bids_desc'
 }
 
 /**
@@ -43,7 +33,8 @@ export type RegisterBiddingRequestData = {
  * This represents the raw data structure before appending to FormData.
  *
  * @type CreateProductRequestData
- * @property {string} name - Product title
+ * @property {string} productName - Name of the product
+ * @property {string} productDescription - Description of the product
  * @property {string} category - Category ID
  * @property {number} startPrice - Starting auction price
  * @property {number} priceStep - Minimum bid increment
@@ -54,15 +45,16 @@ export type RegisterBiddingRequestData = {
  * @property {File[]} images - Array of selected image files
  */
 export type CreateProductRequestData = {
-	name: string
+	productName: string
+	productDescription: string
 	category: string
 	startPrice: number
 	priceStep: number
 	buyNowPrice?: number
-	description: string
 	endTime: string
 	autoExtend: boolean
 	images: File[]
+	allowUnreviewedBidders: boolean
 }
 
 /**

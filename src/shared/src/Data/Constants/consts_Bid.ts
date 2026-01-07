@@ -1,4 +1,18 @@
 /**
+ * Defines the possible states of a bid.
+ *
+ * @enum {string} BID_STATE
+ * @property {string} Active - The bid is active
+ * @property {string} Denied - The bid has been denied
+ * @property {string} Removed - The bid has been removed
+ */
+export enum BID_STATE {
+	Active = 'ACTIVE',
+	Denied = 'DENIED',
+	Removed = 'REMOVED',
+}
+
+/**
  * Defines the status of a transaction after an auction ends.
  *
  * @enum {string} TRANSACTION_STEP

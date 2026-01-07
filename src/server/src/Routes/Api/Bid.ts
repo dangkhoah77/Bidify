@@ -1,15 +1,33 @@
 import express, { Request, Response } from 'express'
-import mongoose from 'mongoose'
-import { body } from 'express-validator'
-import chalk from 'chalk'
+
+import {
+	BidRegisterRequestData,
+	BidUnregisterRequestData,
+	BidDenyRequestData,
+} from 'Shared/Data/Types/index.js'
+import { ROLE } from 'Shared/Data/Constants/index.js'
+
+import { UserDocument } from 'Server/Models/User/index.js'
 
 import Auth from 'Server/Middleware/Auth.js'
+import Role from 'Server/Middleware/Role.js'
 import Validate from 'Server/Middleware/Validate.js'
-import Product, { IProduct } from 'Server/Models/Product.js'
-import Bid from 'Server/Models/Bid.js'
-import { IUser } from 'Server/Models/User.js'
-import { handleBid } from 'Server/Utility/Bid.js'
+import Deduplicate from 'Server/Middleware/Deduplicate.js'
+import Handler from 'Server/Middleware/Handler.js'
 
+import {
+	// Validations
+	ValidateProductId,
+	ValidateBidderId,
+	ValidateMaxPrice,
+
+	// Handlers
+	PlaceBid,
+	UnregisterBid,
+	DenyBid,
+} from 'Server/Services/BidService/index.js'
+
+/** Router for bid-related routes */
 const router = express.Router()
 
 /**
@@ -21,170 +39,53 @@ const router = express.Router()
 router.post(
 	'/register',
 	Auth,
-	Validate([
-		body('productId').notEmpty().withMessage('product Id is required'),
-		body('price')
-			.notEmpty()
-			.isNumeric()
-			.withMessage('price must be a number'),
-		body('maxPrice')
-			.notEmpty()
-			.isNumeric()
-			.withMessage('max price must be a number')
-			.custom((value, { req }) => {
-				if (parseFloat(value) < parseFloat(req.body.price)) {
-					throw new Error(
-						'Max Price cannot be lower than the starting Bid Price'
-					)
-				}
-				return true
-			}),
-	]),
-	async (req: Request, res: Response) => {
-		try {
-			const { productId, price, maxPrice } = req.body
+	Validate([ValidateProductId('productId'), ValidateMaxPrice('maxPrice')]),
+	Deduplicate,
+	Handler(async (req: Request, res: Response) => {
+		const user = req.user as UserDocument
+		const { productId, maxPrice } = req.body as BidRegisterRequestData
 
-			// Get user from auth and product by its id
-			const user = req.user as IUser
-			const userId = user._id as mongoose.Types.ObjectId
-			const product = (await Product.findById(productId)) as IProduct
-
-			// Check if product exists
-			if (!product) {
-				return res.status(404).json({ error: 'Product not found' })
-			}
-
-			// Validate product state
-			if (!product.isActive || new Date() >= product.endTime) {
-				return res
-					.status(400)
-					.json({ error: 'Product is not active for bidding' })
-			}
-
-			// Prevent seller from bidding on own product
-			if (product.seller.toString() == userId.toString()) {
-				return res
-					.status(400)
-					.json({ error: 'You cannot bid on your own product' })
-			}
-
-			// Validate bid price
-			if (price < product.currentPrice + product.priceStep) {
-				return res.status(400).json({
-					error: `Bid price must be ${product.currentPrice + product.priceStep} at minimum`,
-				})
-			}
-
-			// Create a session for placing bif safely
-			const session = await mongoose.startSession()
-			session.startTransaction()
-
-			try {
-				// Create a new bid
-				const bid = new Bid({
-					product: product._id,
-					bidder: userId,
-					price: price,
-					maxPrice: maxPrice,
-					joinedAt: new Date(),
-					latest: true,
-				}).save({ session })
-
-				// Handle the bid logic
-				const updatedProduct = await handleBid(product, userId, price, {
-					session,
-				})
-				await session.commitTransaction()
-
-				// Check if the bid resulted in an immediate purchase
-				if (
-					!updatedProduct.isActive &&
-					updatedProduct.winner?.toString() == userId.toString()
-				) {
-					return res.status(200).json({
-						success: true,
-						message: 'Item purchased via Buy Now',
-						data: { product: updatedProduct, bid: bid },
-					})
-				}
-
-				return res.status(200).json({
-					success: true,
-					message: 'Bid registered successfully',
-					data: { bid: bid },
-				})
-			} catch (error) {
-				await session.abortTransaction()
-				throw error
-			} finally {
-				await session.endSession()
-			}
-		} catch (error) {
-			console.log(
-				`${chalk.red('[Error]')} Bid Registration Error:`,
-				error
-			)
-			return res.status(400).json({ error: 'Failed to register bid' })
-		} finally {
-		}
-	}
+		const result = await PlaceBid(user, productId, maxPrice)
+		return res.status(result.status).json(result.data)
+	})
 )
 
 /**
  * Unregister the user from bidding on a product.
  *
- * @route POST /api/bid/unregister
+ * @route DELETE /api/bid/unregister
  */
-router.post(
+router.delete(
 	'/unregister',
 	Auth,
-	Validate([
-		body('productId').notEmpty().withMessage('product ID is required'),
-	]),
+	Validate([ValidateProductId('productId')]),
+	Deduplicate,
+	Handler(async (req: Request, res: Response) => {
+		const user = req.user as UserDocument
+		const { productId } = req.body as BidUnregisterRequestData
+
+		const result = await UnregisterBid(user, productId)
+		return res.status(result.status).json(result.data)
+	})
+)
+
+/**
+ * Deny a bid placed by a bidder on the seller's product.
+ *
+ * @route DELETE /api/bid/deny
+ */
+router.delete(
+	'/deny',
+	Auth,
+	Role(ROLE.Seller),
+	Validate([ValidateProductId('productId'), ValidateBidderId('bidderId')]),
+	Deduplicate,
 	async (req: Request, res: Response) => {
-		try {
-			const { productId } = req.body
-			const user = req.user as IUser
-			const userId = user._id as mongoose.Types.ObjectId
+		const user = req.user as UserDocument
+		const { productId, bidderId } = req.body as BidDenyRequestData
 
-			// Get the latest bid by the user on the product
-			const bid = await Bid.findOne({
-				product: productId,
-				bidder: userId,
-				latest: true,
-			})
-
-			// If no active bid found, return error
-			if (!bid) {
-				return res
-					.status(404)
-					.json({ error: 'No active bid found to unregister' })
-			}
-
-			// Start a transaction for safe bid unregistration
-			const session = await mongoose.startSession()
-			session.startTransaction()
-
-			try {
-				// Mark the bid as not latest
-				bid.latest = false
-				await bid.save({ session })
-				await session.commitTransaction()
-
-				return res.status(200).json({
-					success: true,
-					message: 'Bid unregistered successfully.',
-				})
-			} catch (error) {
-				await session.abortTransaction()
-				throw error
-			} finally {
-				await session.endSession()
-			}
-		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ error: 'Failed to unregister bid' })
-		}
+		const result = await DenyBid(user, productId, bidderId)
+		return res.status(result.status).json(result.data)
 	}
 )
 
